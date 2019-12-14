@@ -1,0 +1,3 @@
+[submodule "MySqlConnectorWrapper"]
+	path = MySqlConnectorWrapper
+	url = https://github.com/Pustalorc/MySqlConnectorWrapper

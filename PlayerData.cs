@@ -1,26 +1,20 @@
-﻿using Rocket.API;
-using Rocket.Core;
+﻿using System;
 using Steamworks;
-using System;
-using System.Linq;
 
 namespace PlayerInfoLibrary
 {
-    public class PlayerData
+    public sealed class PlayerData
     {
-        public CSteamID SteamID { get; private set; }
+        public CSteamID SteamId { get; private set; }
         public string SteamName { get; internal set; }
         public string CharacterName { get; internal set; }
-        public string IP { get; internal set; }
+        public string Ip { get; internal set; }
+        public ushort ServerId { get; private set; }
         public DateTime LastLoginGlobal { get; internal set; }
-        public int TotalPlayime { get; internal set; }
-        public ushort LastServerID { get; internal set; }
-        public string LastServerName { get; internal set; }
-        public ushort ServerID { get; private set; }
         public DateTime LastLoginLocal { get; internal set; }
-        public bool CleanedBuildables { get; internal set; }
-        public bool CleanedPlayerData { get; internal set; }
-        public DateTime CacheTime { get; internal set; }
+        public int TotalPlayime { get; internal set; }
+        public ushort LastServerId { get; internal set; }
+        public string LastServerName { get; internal set; }
 
         /// <summary>
         /// Checks to see if the server specific data stored in this class is from this server(local).
@@ -28,9 +22,7 @@ namespace PlayerInfoLibrary
         /// <returns>true if the data is from this server.</returns>
         public bool IsLocal()
         {
-            if (!IsValid())
-                return false;
-            return ServerID == PlayerInfoLib.Database.InstanceID;
+            return IsValid() && ServerId == PlayerInfoLib.Instance.database.InstanceId;
         }
 
         /// <summary>
@@ -39,49 +31,28 @@ namespace PlayerInfoLibrary
         /// <returns></returns>
         public bool IsValid()
         {
-            return SteamID != CSteamID.Nil;
-        }
-
-        /// <summary>
-        /// Checks to see if the Cache time on this data has expired.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsCacheExpired()
-        {
-            if (CacheTime != null)
-                return ((DateTime.Now - CacheTime).TotalSeconds >= (PlayerInfoLib.Instance.Configuration.Instance.CacheTime * 60));
-            return true;
-        }
-
-        /// <summary>
-        /// Checks players groups against the config value set in the plugin config to see if they're a VIP.
-        /// </summary>
-        /// <returns>true if a match is found.</returns>
-        public bool IsVip()
-        {
-            if (!IsValid())
-                return false;
-            return R.Permissions.GetGroups(new RocketPlayer(SteamID.ToString()), true).FirstOrDefault(g => g.Id == PlayerInfoLib.Instance.Configuration.Instance.VipCheckGroupName) != null;
+            return SteamId != CSteamID.Nil;
         }
 
         internal PlayerData()
         {
-            SteamID = CSteamID.Nil;
+            SteamId = CSteamID.Nil;
             TotalPlayime = 0;
         }
-        internal PlayerData(CSteamID steamID, string steamName, string characterName, string ip, DateTime lastLoginGlobal, ushort lastServerID, string lastServerName, ushort serverID, DateTime lastLoginLocal, bool cleanedBuildables, bool cleanedPlayerData, int totalPlayTime)
+
+        internal PlayerData(CSteamID steamId, string steamName, string characterName, string ip,
+            DateTime lastLoginGlobal, ushort lastServerId, string lastServerName, ushort serverId,
+            DateTime lastLoginLocal, int totalPlayTime)
         {
-            SteamID = steamID;
+            SteamId = steamId;
             SteamName = steamName;
             CharacterName = characterName;
-            IP = ip;
+            Ip = ip;
             LastLoginGlobal = lastLoginGlobal;
-            LastServerID = lastServerID;
+            LastServerId = lastServerId;
             LastServerName = lastServerName;
-            ServerID = serverID;
+            ServerId = serverId;
             LastLoginLocal = lastLoginLocal;
-            CleanedBuildables = cleanedBuildables;
-            CleanedPlayerData = cleanedPlayerData;
             TotalPlayime = totalPlayTime;
         }
     }
