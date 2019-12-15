@@ -53,13 +53,11 @@ namespace PlayerInfoLibrary.Commands
             }
             else if (Parser.checkIP(target))
             {
-                pInfo = PlayerInfoLib.Instance.database.QueryByName(target, QueryType.Ip, out totalRecods, true,
-                    page, perPage);
+                pInfo = PlayerInfoLib.Instance.database.QueryByName(target, QueryType.Ip);
             }
             else
             {
-                pInfo = PlayerInfoLib.Instance.database.QueryByName(target, QueryType.Both, out totalRecods, true,
-                    page, perPage);
+                pInfo = PlayerInfoLib.Instance.database.QueryByName(target, QueryType.Both);
             }
 
             if (pInfo.Count <= 0)

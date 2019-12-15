@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using I18N.West;
 using MySql.Data.MySqlClient;
@@ -7,11 +6,8 @@ using MySqlX.XDevAPI.Relational;
 using PlayerInfoLibrary.Configuration;
 using Pustalorc.Libraries.MySqlConnectorWrapper;
 using Pustalorc.Libraries.MySqlConnectorWrapper.Queries;
-using Rocket.API;
-using Rocket.Unturned.Chat;
 using SDG.Unturned;
 using Steamworks;
-using UnityEngine;
 using Logger = Rocket.Core.Logging.Logger;
 
 namespace PlayerInfoLibrary.Database
@@ -119,14 +115,15 @@ namespace PlayerInfoLibrary.Database
             return true;
         }
 
-        internal void SetInstanceName(string newName, IRocketPlayer caller)
+        public void SetInstanceName(string newName, QueryCallback callback)
         {
+            if (!Initialized) return;
+
             RequestQueryExecute(false,
                 new Query(
                     $"UPDATE `{Configuration.TableNameInstances}` SET `ServerInstance` = @name WHERE `ServerID` = @instance;",
-                    EQueryType.NonQuery,
-                    output => UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_success")), false,
-                    new MySqlParameter("@name", newName), new MySqlParameter("@instance", InstanceId)));
+                    EQueryType.NonQuery, callback, false, new MySqlParameter("@name", newName),
+                    new MySqlParameter("@instance", InstanceId)));
         }
 
         public PlayerData QueryById(CSteamID steamId)
@@ -137,101 +134,35 @@ namespace PlayerInfoLibrary.Database
             return null;
         }
 
-        public List<PlayerData> QueryByName(string playerName, QueryType queryType, out uint records,
-            bool pagination = true, uint page = 1, uint limit = 4)
+        public List<PlayerData> QueryByName(string playerName, QueryType queryType)
         {
-            var playerList = new List<PlayerData>();
-            MySqlDataReader reader = null;
-            records = 0;
-            var limitStart = (page - 1) * limit;
-            try
+            if (!Initialized)
             {
-                if (!Initialized)
-                {
-                    Logger.LogError("Error: Cant load player info from DB, plugin hasn't initialized properly.");
-                    return playerList;
-                }
-
-                if (page == 0 || limit == 0)
-                {
-                    Logger.LogError("Error: Invalid pagination values, these must be above 0.");
-                    return playerList;
-                }
-
-                if (playerName.Trim() == string.Empty)
-                {
-                    Logger.LogWarning("Warning: Need at least one character in the player name.");
-                    return playerList;
-                }
-
-                var command = Connection.CreateCommand();
-                command.Parameters.AddWithValue("@name", "%" + playerName + "%");
-                command.Parameters.AddWithValue("@instance", InstanceId);
-                string type;
-                switch (queryType)
-                {
-                    case QueryType.Both:
-                        type = "AND (a.SteamName LIKE @name OR a.CharName LIKE @name)";
-                        break;
-                    case QueryType.CharName:
-                        type = "AND a.CharName LIKE @name";
-                        break;
-                    case QueryType.SteamName:
-                        type = "AND a.SteamName LIKE @name";
-                        break;
-                    case QueryType.Ip:
-                        type = "AND a.IP = " + Parser.getUInt32FromIP(playerName);
-                        break;
-                    default:
-                        type = string.Empty;
-                        break;
-                }
-
-                if (pagination)
-                    command.CommandText = "SELECT COUNT(*) AS count FROM (SELECT * FROM (SELECT a.SteamID FROM `" +
-                                          Table + "` AS a LEFT JOIN `" + TableServer +
-                                          "` AS b ON a.SteamID = b.SteamID WHERE (b.ServerID = @instance OR b.ServerID = a.LastServerID OR b.ServerID IS NULL) " +
-                                          type + " ORDER BY b.LastLoginLocal ASC) AS g GROUP BY g.SteamID) AS c;";
-                command.CommandText +=
-                    "SELECT * FROM (SELECT a.SteamID, a.SteamName, a.CharName, a.IP, a.LastLoginGlobal, a.TotalPlayTime, a.LastServerID, b.ServerID, b.LastLoginLocal, b.CleanedBuildables, b.CleanedPlayerData, c.ServerName AS LastServerName FROM `" +
-                    Table + "` AS a LEFT JOIN `" + TableServer + "` AS b ON a.SteamID = b.SteamID LEFT JOIN `" +
-                    TableInstance +
-                    "` AS c ON a.LastServerID = c.ServerID WHERE (b.ServerID = @instance OR b.ServerID = a.LastServerID OR b.ServerID IS NULL) " +
-                    type + " ORDER BY b.LastLoginLocal ASC) AS g GROUP BY g.SteamID ORDER BY g.LastLoginGlobal DESC" +
-                    (pagination ? " LIMIT " + limitStart + ", " + limit + ";" : ";");
-                reader = command.ExecuteReader();
-                if (pagination)
-                {
-                    if (reader.Read())
-                        records = reader.GetUInt32("count");
-                    if (!reader.NextResult()) return playerList;
-                }
-
-                if (!reader.HasRows) return playerList;
-                while (reader.Read())
-                {
-                    var record = BuildPlayerData(reader);
-                    record.CacheTime = DateTime.Now;
-                    playerList.Add(record);
-                }
-
-                if (!pagination)
-                    records = (uint) playerList.Count;
-            }
-            catch (MySqlException ex)
-            {
-                HandleException(ex);
-            }
-            finally
-            {
-                if (reader != null)
-                {
-                    reader.Close();
-                    reader.Dispose();
-                }
+                Logger.LogError("Error: Cant load player info from DB, plugin hasn't initialized properly.");
+                return new List<PlayerData>();
             }
 
-            return playerList;
+            if (!string.IsNullOrEmpty(playerName.Trim()))
+                return _allPlayerData.Where(k =>
+                {
+                    switch (queryType)
+                    {
+                        case QueryType.Both:
+                            return k.SteamName.ToLowerInvariant().Contains(playerName.ToLowerInvariant()) ||
+                                   k.CharacterName.ToLowerInvariant().Contains(playerName.ToLowerInvariant());
+                        case QueryType.CharName:
+                            return k.CharacterName.ToLowerInvariant().Contains(playerName.ToLowerInvariant());
+                        case QueryType.SteamName:
+                            return k.SteamName.ToLowerInvariant().Contains(playerName.ToLowerInvariant());
+                        case QueryType.Ip:
+                            return k.Ip == Parser.getUInt32FromIP(playerName).ToString();
+                        default:
+                            return false;
+                    }
+                }).ToList();
+
+            Logger.LogWarning("Warning: Need at least one character in the player name.");
+            return new List<PlayerData>();
         }
 
         private PlayerData BuildPlayerData(Row row)
@@ -239,110 +170,17 @@ namespace PlayerInfoLibrary.Database
             return new PlayerData(new CSteamID(ulong.Parse(row["SteamID"].ToString())),
                 row["SteamName"].ToString(), row["CharName"].ToString(), row["IP"].ToString(),
                 long.Parse(row["LastLoginGlobal"].ToString()).FromTimeStamp(), ushort.Parse(row["LastServerID"].ToString()),
-                row["LastServerName"].ToString(), ushort.Parse(row["ServerID"].ToString()),
+                row["LastServerName"].ToString(), InstanceId,
                 long.Parse(row["LastLoginLocal"].ToString()).FromTimeStamp(), int.Parse(row["TotalPlayTime"].ToString()));
         }
 
-        internal bool RemoveInstance(ushort instanceId)
+        public void RemoveInstance(ushort instanceId, QueryCallback callback)
         {
-            if (!Initialized) return false;
+            if (!Initialized) return;
 
-            MySqlDataReader reader = null;
-            var records = new Dictionary<ulong, object[]>();
-            try
-            {
-                var command = Connection.CreateCommand();
-                command.Parameters.AddWithValue("@forinstance", instanceId);
-                command.CommandText = "SELECT ServerID FROM `" + TableInstance + "` WHERE ServerID = @forinstance;";
-                var result = command.ExecuteScalar();
-                if (result == null) return false;
-                command.CommandText = "SELECT SteamID FROM `" + TableServer + "` WHERE ServerID = @forinstance";
-                reader = command.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read()) records.Add(reader.GetUInt64("SteamID"), new object[] { });
-                    reader.Close();
-                    reader.Dispose();
-                    ProcessRecordRemoval(command, records, instanceId);
-                    command.CommandText =
-                        "DELETE FROM `" + TableInstance + "` WHERE ServerID = " + instanceId + ";";
-                    command.ExecuteNonQuery();
-                    if (instanceId == this.InstanceId)
-                        Initialized = false;
-                    return true;
-                }
-            }
-            catch (MySqlException ex)
-            {
-                HandleException(ex);
-                return false;
-            }
-            finally
-            {
-                if (reader != null)
-                {
-                    reader.Close();
-                    reader.Dispose();
-                }
-            }
-
-            return true;
-        }
-
-        private void ProcessRecordRemoval(MySqlCommand command, Dictionary<ulong, object[]> records, ushort instanceId,
-            bool instanceRemoval = true)
-        {
-            try
-            {
-                var totalRemoved = 0;
-                var totalRemovedServer = 0;
-                var recordNum = 0;
-                if (instanceRemoval)
-                    Logger.Log(
-                        $"Starting player info removal process For the entered Instance ID, number of records to process: {records.Count}.",
-                        ConsoleColor.Yellow);
-                else
-                    Logger.Log(
-                        $"Starting expired player info cleanup process, number of records to cleanup in this batch: {records.Count}",
-                        ConsoleColor.Yellow);
-
-                foreach (var val in records)
-                {
-                    var count = 0;
-                    recordNum++;
-                    if (recordNum % 1000 == 0)
-                        Logger.Log($"Processing record: {recordNum} of {records.Count}");
-                    command.CommandText = "SELECT COUNT(*) as count FROM `" + TableServer + "` WHERE SteamID = " +
-                                          val.Key + ";";
-                    var resultc = command.ExecuteScalar();
-                    if (resultc != null && resultc != DBNull.Value)
-                        if (int.TryParse(resultc.ToString(), out count))
-                        {
-                            if (!instanceRemoval)
-                                Logger.Log(
-                                    $"Removing Player info for: {val.Value[0]} [{val.Value[1]}] ({val.Key})");
-                            if (count <= 1)
-                            {
-                                command.CommandText = "DELETE FROM `" + Table + "` WHERE SteamID = " + val.Key + ";";
-                                command.ExecuteNonQuery();
-                                totalRemoved++;
-                            }
-
-                            command.CommandText = "DELETE FROM `" + TableServer + "` WHERE SteamID = " + val.Key +
-                                                  " AND ServerID = " + instanceId + ";";
-                            command.ExecuteNonQuery();
-                            totalRemovedServer++;
-                        }
-                }
-
-                Logger.Log(
-                    $"Finished player info cleanup. Number cleaned: {TableServer}: {totalRemovedServer}, {Table}: {totalRemoved}.",
-                    ConsoleColor.Yellow);
-            }
-            catch (MySqlException ex)
-            {
-                HandleException(ex);
-            }
+            RequestQueryExecute(false, new Query(
+                $"DELETE FROM `{Configuration.TableNameInstances}` WHERE ServerID = {instanceId};",
+                EQueryType.NonQuery, callback));
         }
 
         public void SaveToDb(PlayerData pdata)
@@ -365,14 +203,6 @@ namespace PlayerInfoLibrary.Database
                     EQueryType.NonQuery, null, false, new MySqlParameter("@steamid", pdata.SteamId), new MySqlParameter("@steamname", pdata.SteamName.Truncate(200)), new MySqlParameter("@charname", pdata.CharacterName.Truncate(200)),
                     new MySqlParameter("@ip", Parser.getUInt32FromIP(pdata.Ip)), new MySqlParameter("@lastinstanceid", pdata.LastServerId), new MySqlParameter("@lastloginglobal", pdata.LastLoginGlobal.ToTimeStamp()), new MySqlParameter("@totalplaytime", pdata.TotalPlayime),
                     new MySqlParameter(), new MySqlParameter()));
-            
-                
-                command.Parameters.AddWithValue();
-                command.Parameters.AddWithValue("@instanceid", pdata.ServerId);
-                command.Parameters.AddWithValue();
-                command.Parameters.AddWithValue();
-                command.Parameters.AddWithValue();
-                command.Parameters.AddWithValue("@lastloginlocal", pdata.LastLoginLocal.ToTimeStamp());
         }
     }
 }

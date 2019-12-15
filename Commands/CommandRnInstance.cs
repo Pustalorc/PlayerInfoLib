@@ -19,7 +19,8 @@ namespace PlayerInfoLibrary.Commands
             {
                 case 1:
                     var newName = command[0].ToLower();
-                    PlayerInfoLib.Instance.database.SetInstanceName(newName, caller);
+                    PlayerInfoLib.Instance.database.SetInstanceName(newName,
+                        output => UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_success")));
                     break;
                 default:
                     UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_help"));

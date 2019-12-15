@@ -27,10 +27,8 @@ namespace PlayerInfoLibrary.Commands
                         return;
                     }
 
-                    UnturnedChat.Say(caller,
-                        PlayerInfoLib.Instance.database.RemoveInstance(id)
-                            ? PlayerInfoLib.Instance.Translate("delint_success")
-                            : PlayerInfoLib.Instance.Translate("delint_not_found"));
+                    PlayerInfoLib.Instance.database.RemoveInstance(id,
+                        output => UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("delint_success")));
                     break;
                 default:
                     UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("delint_help"));
