@@ -115,9 +115,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Libraries\BouncyCastle.Crypto.dll" />
-    <Content Include="Libraries\Google.Protobuf.dll" />
-    <Content Include="Libraries\Renci.SshNet.dll" />
     <Content Include="lib\Assembly-CSharp-firstpass.dll" />
     <Content Include="lib\Assembly-CSharp.dll" />
     <Content Include="lib\Rocket.API.dll" />
@@ -143,6 +140,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Libraries\System.Transactions.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libraries\BouncyCastle.Crypto.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libraries\Google.Protobuf.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Libraries\Renci.SshNet.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

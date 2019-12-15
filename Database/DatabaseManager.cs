@@ -28,7 +28,7 @@ namespace PlayerInfoLibrary.Database
             {
                 new Query($"SHOW TABLES LIKE '{Configuration.TableNameInstances}';", EQueryType.Scalar),
                 new Query(
-                    $"CREATE TABLE `{Configuration.TableNameInstances}` (`ServerID` smallint(5) unsigned NOT NULL AUTO_INCREMENT, `ServerInstance` varchar(128) COLLATE utf8_unicode_ci NOT NULL, `ServerName` varchar(60) COLLATE utf8_unicode_ci NOT NULL, PRIMARY KEY(`ServerID`), UNIQUE KEY `ServerInstance` (`ServerInstance`)));",
+                    $"CREATE TABLE `{Configuration.TableNameInstances}` (`ServerID` smallint(5) unsigned NOT NULL AUTO_INCREMENT, `ServerInstance` varchar(128) COLLATE utf8_unicode_ci NOT NULL, `ServerName` varchar(60) COLLATE utf8_unicode_ci NOT NULL, PRIMARY KEY(`ServerID`), UNIQUE KEY `ServerInstance` (`ServerInstance`));",
                     EQueryType.NonQuery)
             }
         };
