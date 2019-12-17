@@ -1,4 +1,5 @@
 ﻿using System;
+using Rocket.Core.Logging;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 
@@ -13,7 +14,7 @@ namespace PlayerInfoLibrary
         protected override void Load()
         {
             var pData = PlayerInfoLib.Instance.database.QueryById(Player.CSteamID);
-            var totalTime = pData.TotalPlayime;
+            var totalTime = pData?.TotalPlayime ?? 0;
             _startTime = DateTime.Now;
             _start = true;
             _pData = new PlayerData(Player.CSteamID, Player.SteamName, Player.CharacterName, Player.CSteamID.GetIp(),

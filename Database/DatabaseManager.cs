@@ -2,10 +2,10 @@
 using System.Linq;
 using I18N.West;
 using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI.Relational;
 using PlayerInfoLibrary.Configuration;
 using Pustalorc.Libraries.MySqlConnectorWrapper;
 using Pustalorc.Libraries.MySqlConnectorWrapper.Queries;
+using Pustalorc.Libraries.MySqlConnectorWrapper.TableStructure;
 using SDG.Unturned;
 using Steamworks;
 using Logger = Rocket.Core.Logging.Logger;
@@ -22,7 +22,7 @@ namespace PlayerInfoLibrary.Database
             {
                 new Query($"SHOW TABLES LIKE '{Configuration.TableNamePlayers}';", EQueryType.Scalar),
                 new Query(
-                    $"CREATE TABLE `{Configuration.TableNamePlayers}` (`SteamID` bigint(24) unsigned NOT NULL, `SteamName` varchar(255) COLLATE utf8_unicode_ci NOT NULL, `CharName` varchar(255) COLLATE utf8_unicode_ci NOT NULL, `IP` varchar(16) COLLATE utf8_unicode_ci NOT NULL, `LastLoginGlobal` bigint(32) NOT NULL, `LastServerID` smallint(5) unsigned NOT NULL, PRIMARY KEY (`SteamID`), KEY `LastServerID` (`LastServerID`), KEY `IP` (`IP`));",
+                    $"CREATE TABLE `{Configuration.TableNamePlayers}` (`SteamID` bigint(24) unsigned NOT NULL, `SteamName` varchar(255) COLLATE utf8_unicode_ci NOT NULL, `CharName` varchar(255) COLLATE utf8_unicode_ci NOT NULL, `IP` varchar(16) COLLATE utf8_unicode_ci NOT NULL, `LastLoginGlobal` bigint(32) NOT NULL, `TotalPlayTime` INT NOT NULL, `LastServerID` smallint(5) unsigned NOT NULL, PRIMARY KEY (`SteamID`), KEY `LastServerID` (`LastServerID`), KEY `IP` (`IP`));",
                     EQueryType.NonQuery)
             },
             {
@@ -200,7 +200,14 @@ namespace PlayerInfoLibrary.Database
             RequestQueryExecute(false,
                 new Query(
                     $"INSERT INTO `{Configuration.TableNamePlayers}` (`SteamID`, `SteamName`, `CharName`, `IP`, `LastLoginGlobal`, `TotalPlayTime`, `LastServerID`) VALUES (@steamid, @steamname, @charname, @ip, @lastloginglobal, @totalplaytime, @lastinstanceid) ON DUPLICATE KEY UPDATE `SteamName` = VALUES(`SteamName`), `CharName` = VALUES(`CharName`), `IP` = VALUES(`IP`), `LastLoginGlobal` = VALUES(`LastLoginglobal`), `TotalPlayTime` = VALUES(`TotalPlayTime`), `LastServerID` = VALUES(`LastServerID`);",
-                    EQueryType.NonQuery, null, false, new MySqlParameter("@steamid", pdata.SteamId), new MySqlParameter("@steamname", pdata.SteamName.Truncate(200)), new MySqlParameter("@charname", pdata.CharacterName.Truncate(200)),
+                    EQueryType.NonQuery, output =>
+                    {
+                        var indexOf = _allPlayerData.FindIndex(k => k.SteamId == pdata.SteamId);
+                        if (indexOf < 0)
+                            _allPlayerData.Add(pdata);
+                        else
+                            _allPlayerData[indexOf] = pdata;
+                    }, false, new MySqlParameter("@steamid", pdata.SteamId), new MySqlParameter("@steamname", pdata.SteamName.Truncate(200)), new MySqlParameter("@charname", pdata.CharacterName.Truncate(200)),
                     new MySqlParameter("@ip", Parser.getUInt32FromIP(pdata.Ip)), new MySqlParameter("@lastinstanceid", pdata.LastServerId), new MySqlParameter("@lastloginglobal", pdata.LastLoginGlobal.ToTimeStamp()), new MySqlParameter("@totalplaytime", pdata.TotalPlayime),
                     new MySqlParameter(), new MySqlParameter()));
         }
