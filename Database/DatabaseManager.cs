@@ -66,6 +66,8 @@ namespace PlayerInfoLibrary.Database
                 return;
             }
 
+            ExecuteQuery(GetPlayerDataQuery);
+
             Initialized = true;
         }
 
@@ -203,10 +205,13 @@ namespace PlayerInfoLibrary.Database
                     EQueryType.NonQuery, output =>
                     {
                         var indexOf = _allPlayerData.FindIndex(k => k.SteamId == pdata.SteamId);
-                        if (indexOf < 0)
-                            _allPlayerData.Add(pdata);
-                        else
-                            _allPlayerData[indexOf] = pdata;
+                        lock (_memory)
+                        {
+                            if (indexOf < 0)
+                                _allPlayerData.Add(pdata);
+                            else
+                                _allPlayerData[indexOf] = pdata;
+                        }
                     }, false, new MySqlParameter("@steamid", pdata.SteamId), new MySqlParameter("@steamname", pdata.SteamName.Truncate(200)), new MySqlParameter("@charname", pdata.CharacterName.Truncate(200)),
                     new MySqlParameter("@ip", Parser.getUInt32FromIP(pdata.Ip)), new MySqlParameter("@lastinstanceid", pdata.LastServerId), new MySqlParameter("@lastloginglobal", pdata.LastLoginGlobal.ToTimeStamp()), new MySqlParameter("@totalplaytime", pdata.TotalPlayime),
                     new MySqlParameter(), new MySqlParameter()));
