@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using I18N.West;
 using MySql.Data.MySqlClient;
@@ -34,7 +35,7 @@ namespace PlayerInfoLibrary.Database
         };
 
         public Query GetPlayerDataQuery => _getPlayerDataQuery ??= new Query(
-            $"SELECT * FROM `{Configuration.TableNamePlayers}`;",
+            $"SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.IP, t1.LastLoginGlobal, t1.TotalPlayTime, t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerID=t2.ServerID;",
             EQueryType.Reader, PlayerDataFetched, true);
 
         private List<PlayerData> _allPlayerData = new List<PlayerData>();
@@ -73,11 +74,11 @@ namespace PlayerInfoLibrary.Database
 
         private void PlayerDataFetched(QueryOutput queryOutput)
         {
-            if (queryOutput.Query.QueryType != EQueryType.Reader) return;
+            if (queryOutput.Query.QueryType != EQueryType.Reader || !(queryOutput.Output is List<Row> rows)) return;
 
             lock (_memory)
             {
-                _allPlayerData = (from row in (List<Row>) queryOutput.Output select BuildPlayerData(row)).ToList();
+                _allPlayerData = (from row in rows select BuildPlayerData(row)).ToList();
             }
         }
 
@@ -172,8 +173,7 @@ namespace PlayerInfoLibrary.Database
             return new PlayerData(new CSteamID(ulong.Parse(row["SteamID"].ToString())),
                 row["SteamName"].ToString(), row["CharName"].ToString(), row["IP"].ToString(),
                 long.Parse(row["LastLoginGlobal"].ToString()).FromTimeStamp(), ushort.Parse(row["LastServerID"].ToString()),
-                row["LastServerName"].ToString(), InstanceId,
-                long.Parse(row["LastLoginLocal"].ToString()).FromTimeStamp(), int.Parse(row["TotalPlayTime"].ToString()));
+                row["LastServerName"].ToString(), InstanceId, int.Parse(row["TotalPlayTime"].ToString()));
         }
 
         public void RemoveInstance(ushort instanceId, QueryCallback callback)
@@ -213,8 +213,7 @@ namespace PlayerInfoLibrary.Database
                                 _allPlayerData[indexOf] = pdata;
                         }
                     }, false, new MySqlParameter("@steamid", pdata.SteamId), new MySqlParameter("@steamname", pdata.SteamName.Truncate(200)), new MySqlParameter("@charname", pdata.CharacterName.Truncate(200)),
-                    new MySqlParameter("@ip", Parser.getUInt32FromIP(pdata.Ip)), new MySqlParameter("@lastinstanceid", pdata.LastServerId), new MySqlParameter("@lastloginglobal", pdata.LastLoginGlobal.ToTimeStamp()), new MySqlParameter("@totalplaytime", pdata.TotalPlayime),
-                    new MySqlParameter(), new MySqlParameter()));
+                    new MySqlParameter("@ip", Parser.getUInt32FromIP(pdata.Ip)), new MySqlParameter("@lastinstanceid", pdata.LastServerId), new MySqlParameter("@lastloginglobal", pdata.LastLoginGlobal.ToTimeStamp()), new MySqlParameter("@totalplaytime", pdata.TotalPlayime)));
         }
     }
 }

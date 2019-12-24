@@ -11,7 +11,6 @@ namespace PlayerInfoLibrary
         public string Ip { get; internal set; }
         public ushort ServerId { get; private set; }
         public DateTime LastLoginGlobal { get; internal set; }
-        public DateTime LastLoginLocal { get; internal set; }
         public int TotalPlayime { get; internal set; }
         public ushort LastServerId { get; internal set; }
         public string LastServerName { get; internal set; }
@@ -34,15 +33,8 @@ namespace PlayerInfoLibrary
             return SteamId != CSteamID.Nil;
         }
 
-        internal PlayerData()
-        {
-            SteamId = CSteamID.Nil;
-            TotalPlayime = 0;
-        }
-
         internal PlayerData(CSteamID steamId, string steamName, string characterName, string ip,
-            DateTime lastLoginGlobal, ushort lastServerId, string lastServerName, ushort serverId,
-            DateTime lastLoginLocal, int totalPlayTime)
+            DateTime lastLoginGlobal, ushort lastServerId, string lastServerName, ushort serverId, int totalPlayTime)
         {
             SteamId = steamId;
             SteamName = steamName;
@@ -52,7 +44,6 @@ namespace PlayerInfoLibrary
             LastServerId = lastServerId;
             LastServerName = lastServerName;
             ServerId = serverId;
-            LastLoginLocal = lastLoginLocal;
             TotalPlayime = totalPlayTime;
         }
     }

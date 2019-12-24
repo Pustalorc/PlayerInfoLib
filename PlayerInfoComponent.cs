@@ -19,7 +19,7 @@ namespace PlayerInfoLibrary
             _start = true;
             _pData = new PlayerData(Player.CSteamID, Player.SteamName, Player.CharacterName, Player.CSteamID.GetIp(),
                 _startTime, PlayerInfoLib.Instance.database.InstanceId, Provider.serverName,
-                PlayerInfoLib.Instance.database.InstanceId, _startTime, totalTime);
+                PlayerInfoLib.Instance.database.InstanceId, totalTime);
             PlayerInfoLib.Instance.database.SaveToDb(_pData);
         }
 

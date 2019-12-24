@@ -79,7 +79,7 @@ namespace PlayerInfoLibrary.Commands
                         $"{start}: {(caller is ConsolePlayer ? pData.CharacterName : pData.CharacterName.Truncate(12))} [{(caller is ConsolePlayer ? pData.SteamName : pData.SteamName.Truncate(12))}] ({pData.SteamId}), IP: {pData.Ip}, Local: {pData.IsLocal()}",
                         Color.yellow);
                     UnturnedChat.Say(caller,
-                        $"Seen: {pData.LastLoginLocal}, TT: {pData.TotalPlayime.FormatTotalTime()}",
+                        $"Seen: {pData.LastLoginGlobal}, TT: {pData.TotalPlayime.FormatTotalTime()}",
                         Color.yellow);
                 }
                 else
@@ -88,7 +88,7 @@ namespace PlayerInfoLibrary.Commands
                         $"{start}: {(caller is ConsolePlayer ? pData.CharacterName : pData.CharacterName.Truncate(12))} [{(caller is ConsolePlayer ? pData.SteamName : pData.SteamName.Truncate(12))}] ({pData.SteamId}), IP: {pData.Ip}, Local: {pData.IsLocal()}",
                         Color.yellow);
                     UnturnedChat.Say(caller,
-                        $"Seen: {pData.LastLoginLocal}, TT: {pData.TotalPlayime.FormatTotalTime()}, on: {pData.LastServerId}:{pData.LastServerName}",
+                        $"Seen: {pData.LastLoginGlobal}, TT: {pData.TotalPlayime.FormatTotalTime()}, on: {pData.LastServerId}:{pData.LastServerName}",
                         Color.yellow);
                 }
             }
