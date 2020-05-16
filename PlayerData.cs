@@ -5,24 +5,20 @@ namespace PlayerInfoLibrary
 {
     public sealed class PlayerData
     {
+        // IDENTIFYABLE PERSONAL DATA
         public CSteamID SteamId { get; private set; }
+        public ulong LastQuestGroupId { get; internal set; }
+        public string GroupName { get; internal set; }
         public string SteamName { get; internal set; }
         public string CharacterName { get; internal set; }
-        public string Ip { get; internal set; }
-        public ushort ServerId { get; private set; }
-        public DateTime LastLoginGlobal { get; internal set; }
-        public int TotalPlayime { get; internal set; }
-        public ushort LastServerId { get; internal set; }
-        public string LastServerName { get; internal set; }
+        public string Hwid { get; internal set; }
+        public uint Ip { get; internal set; }
 
-        /// <summary>
-        /// Checks to see if the server specific data stored in this class is from this server(local).
-        /// </summary>
-        /// <returns>true if the data is from this server.</returns>
-        public bool IsLocal()
-        {
-            return IsValid() && ServerId == PlayerInfoLib.Instance.database.InstanceId;
-        }
+        // SERVER RELATED DATA
+        public ulong TotalPlaytime { get; internal set; }
+        public ushort ServerId { get; private set; }
+        public string ServerName { get; internal set; }
+        public DateTime LastLoginGlobal { get; internal set; }
 
         /// <summary>
         /// Checks to see if the data is valid.
@@ -33,18 +29,31 @@ namespace PlayerInfoLibrary
             return SteamId != CSteamID.Nil;
         }
 
-        internal PlayerData(CSteamID steamId, string steamName, string characterName, string ip,
-            DateTime lastLoginGlobal, ushort lastServerId, string lastServerName, ushort serverId, int totalPlayTime)
+        internal PlayerData(CSteamID steamId, string steamName, string characterName, ulong groupId, string groupName, uint ip, string hwid, string serverName, ushort serverId, ulong totalPlaytime, DateTime lastLoginGlobal)
         {
             SteamId = steamId;
             SteamName = steamName;
             CharacterName = characterName;
+            LastQuestGroupId = groupId;
+            GroupName = groupName;
             Ip = ip;
             LastLoginGlobal = lastLoginGlobal;
-            LastServerId = lastServerId;
-            LastServerName = lastServerName;
+            ServerName = serverName;
             ServerId = serverId;
-            TotalPlayime = totalPlayTime;
+            TotalPlaytime = totalPlaytime;
+        }
+
+        internal PlayerData(CSteamID steamId, string steamName, string characterName, ulong groupId, uint ip, string hwid, string serverName, ushort serverId, ulong totalPlaytime, DateTime lastLoginGlobal)
+        {
+            SteamId = steamId;
+            SteamName = steamName;
+            CharacterName = characterName;
+            LastQuestGroupId = groupId;
+            Ip = ip;
+            LastLoginGlobal = lastLoginGlobal;
+            ServerName = serverName;
+            ServerId = serverId;
+            TotalPlaytime = totalPlaytime;
         }
     }
 }

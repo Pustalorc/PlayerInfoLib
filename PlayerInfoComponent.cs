@@ -1,5 +1,4 @@
 ﻿using System;
-using Rocket.Core.Logging;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 
@@ -14,13 +13,15 @@ namespace PlayerInfoLibrary
         protected override void Load()
         {
             var pData = PlayerInfoLib.Instance.database.QueryById(Player.CSteamID);
-            var totalTime = pData?.TotalPlayime ?? 0;
+            var playtime = pData?.TotalPlaytime ?? 0;
             _startTime = DateTime.Now;
             _start = true;
-            _pData = new PlayerData(Player.CSteamID, Player.SteamName, Player.CharacterName, Player.CSteamID.GetIp(),
-                _startTime, PlayerInfoLib.Instance.database.InstanceId, Provider.serverName,
-                PlayerInfoLib.Instance.database.InstanceId, totalTime);
+
+            var hwid = string.Join("", Player.SteamPlayer().playerID.hwid);
+
+            _pData = new PlayerData(Player.CSteamID, Player.SteamName, Player.CharacterName, Player.Player.quests.groupID.m_SteamID, Player.CSteamID.GetIp(pData.Ip), hwid, Provider.serverName, PlayerInfoLib.Instance.database.InstanceId, playtime, _startTime);
             PlayerInfoLib.Instance.database.SaveToDb(_pData);
+            Player.Player.GetGroupName(_pData);
         }
 
         protected override void Unload()
@@ -29,10 +30,10 @@ namespace PlayerInfoLibrary
 
             var pData = PlayerInfoLib.Instance.database.QueryById(Player.CSteamID);
 
-            if (!pData.IsValid() || !pData.IsLocal()) return;
+            if (!pData.IsValid()) return;
 
-            var totalSessionTime = (int) DateTime.Now.Subtract(_startTime).TotalSeconds;
-            pData.TotalPlayime += totalSessionTime;
+            var totalSessionTime = (ulong) DateTime.Now.Subtract(_startTime).TotalSeconds;
+            pData.TotalPlaytime += totalSessionTime;
             PlayerInfoLib.Instance.database.SaveToDb(pData);
         }
     }

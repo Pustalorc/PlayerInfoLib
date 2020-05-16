@@ -39,10 +39,9 @@ namespace PlayerInfoLibrary
             database = new DatabaseManager(Configuration.Instance);
 
             if (database.Initialized)
-                Logger.LogWarning(
-                    $"PlayerInfoLib plugin has been loaded, Server Instance ID is: {database.InstanceId}");
+                Logger.Log($"PlayerInfoLib plugin has been loaded, Server Instance ID is: {database.InstanceId}");
             else
-                Logger.LogError("There was in issue loading the plugin, please check your config.");
+                Logger.LogWarning("There was in issue loading the plugin, please check your config.");
         }
 
         protected override void Unload()

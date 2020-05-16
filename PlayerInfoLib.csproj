@@ -101,8 +101,12 @@
       <HintPath>lib\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>lib\UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\CommandCheckOwner.cs" />
     <Compile Include="Commands\CommandDelInstance.cs" />
     <Compile Include="Commands\CommandInvestigate.cs" />
     <Compile Include="Commands\CommandRnInstance.cs" />

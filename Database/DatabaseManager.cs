@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using I18N.West;
 using MySql.Data.MySqlClient;
@@ -23,7 +22,7 @@ namespace PlayerInfoLibrary.Database
             {
                 new Query($"SHOW TABLES LIKE '{Configuration.TableNamePlayers}';", EQueryType.Scalar),
                 new Query(
-                    $"CREATE TABLE `{Configuration.TableNamePlayers}` (`SteamID` bigint(24) unsigned NOT NULL, `SteamName` varchar(255) COLLATE utf8_unicode_ci NOT NULL, `CharName` varchar(255) COLLATE utf8_unicode_ci NOT NULL, `IP` varchar(16) COLLATE utf8_unicode_ci NOT NULL, `LastLoginGlobal` bigint(32) NOT NULL, `TotalPlayTime` INT NOT NULL, `LastServerID` smallint(5) unsigned NOT NULL, PRIMARY KEY (`SteamID`), KEY `LastServerID` (`LastServerID`), KEY `IP` (`IP`));",
+                    $"CREATE TABLE `{Configuration.TableNamePlayers}` (`SteamID` BIGINT UNSIGNED NOT NULL, `SteamName` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL, `CharName` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL, `LastQuestGroupId` BIGINT UNSIGNED NOT NULL DEFAULT 0, `LastQuestGroupName` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N/A', `HWID` varchar(255) COLLATE utf8_unicode_ci NOT NULL, `IP` INT UNSIGNED NOT NULL DEFAULT 4294967295, `LastLoginGlobal` BIGINT(32) NOT NULL, `TotalPlaytime` BIGINT UNSIGNED NOT NULL, `LastServerId` SMALLINT UNSIGNED NOT NULL, PRIMARY KEY (`SteamID`), KEY `LastServerId` (`LastServerId`), KEY `HWID` (`HWID`), KEY `IP` (`IP`));",
                     EQueryType.NonQuery)
             },
             {
@@ -35,7 +34,7 @@ namespace PlayerInfoLibrary.Database
         };
 
         public Query GetPlayerDataQuery => _getPlayerDataQuery ??= new Query(
-            $"SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.IP, t1.LastLoginGlobal, t1.TotalPlayTime, t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerID=t2.ServerID;",
+            $"SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.LastQuestGroupId, t1.LastQuestGroupName, t1.HWID, t1.IP, t1.LastLoginGlobal, t1.TotalPlaytime, t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerId=t2.ServerID;",
             EQueryType.Reader, PlayerDataFetched, true);
 
         private List<PlayerData> _allPlayerData = new List<PlayerData>();
@@ -158,7 +157,7 @@ namespace PlayerInfoLibrary.Database
                         case QueryType.SteamName:
                             return k.SteamName.ToLowerInvariant().Contains(playerName.ToLowerInvariant());
                         case QueryType.Ip:
-                            return k.Ip == Parser.getUInt32FromIP(playerName).ToString();
+                            return k.Ip == Parser.getUInt32FromIP(playerName);
                         default:
                             return false;
                     }
@@ -170,19 +169,14 @@ namespace PlayerInfoLibrary.Database
 
         private PlayerData BuildPlayerData(Row row)
         {
-            return new PlayerData(new CSteamID(ulong.Parse(row["SteamID"].ToString())),
-                row["SteamName"].ToString(), row["CharName"].ToString(), row["IP"].ToString(),
-                long.Parse(row["LastLoginGlobal"].ToString()).FromTimeStamp(), ushort.Parse(row["LastServerID"].ToString()),
-                row["LastServerName"].ToString(), InstanceId, int.Parse(row["TotalPlayTime"].ToString()));
+            return new PlayerData(new CSteamID(ulong.Parse(row["SteamID"].ToString())),row["SteamName"].ToString(), row["CharName"].ToString(), ulong.Parse(row["LastQuestGroupId"].ToString()), row["LastQuestGroupName"].ToString(), uint.Parse(row["IP"].ToString()),row["HWID"].ToString(), row["LastServerName"].ToString(), InstanceId, ulong.Parse(row["TotalPlaytime"].ToString()), long.Parse(row["LastLoginGlobal"].ToString()).FromTimeStamp());
         }
 
         public void RemoveInstance(ushort instanceId, QueryCallback callback)
         {
             if (!Initialized) return;
 
-            RequestQueryExecute(false, new Query(
-                $"DELETE FROM `{Configuration.TableNameInstances}` WHERE ServerID = {instanceId};",
-                EQueryType.NonQuery, callback));
+            RequestQueryExecute(false, new Query($"DELETE FROM `{Configuration.TableNameInstances}` WHERE ServerID = {instanceId};",EQueryType.NonQuery, callback));
         }
 
         public void SaveToDb(PlayerData pdata)
@@ -198,22 +192,8 @@ namespace PlayerInfoLibrary.Database
                 Logger.LogError("Error: Invalid player data information.");
                 return;
             }
-
-            RequestQueryExecute(false,
-                new Query(
-                    $"INSERT INTO `{Configuration.TableNamePlayers}` (`SteamID`, `SteamName`, `CharName`, `IP`, `LastLoginGlobal`, `TotalPlayTime`, `LastServerID`) VALUES (@steamid, @steamname, @charname, @ip, @lastloginglobal, @totalplaytime, @lastinstanceid) ON DUPLICATE KEY UPDATE `SteamName` = VALUES(`SteamName`), `CharName` = VALUES(`CharName`), `IP` = VALUES(`IP`), `LastLoginGlobal` = VALUES(`LastLoginglobal`), `TotalPlayTime` = VALUES(`TotalPlayTime`), `LastServerID` = VALUES(`LastServerID`);",
-                    EQueryType.NonQuery, output =>
-                    {
-                        var indexOf = _allPlayerData.FindIndex(k => k.SteamId == pdata.SteamId);
-                        lock (_memory)
-                        {
-                            if (indexOf < 0)
-                                _allPlayerData.Add(pdata);
-                            else
-                                _allPlayerData[indexOf] = pdata;
-                        }
-                    }, false, new MySqlParameter("@steamid", pdata.SteamId), new MySqlParameter("@steamname", pdata.SteamName.Truncate(200)), new MySqlParameter("@charname", pdata.CharacterName.Truncate(200)),
-                    new MySqlParameter("@ip", Parser.getUInt32FromIP(pdata.Ip)), new MySqlParameter("@lastinstanceid", pdata.LastServerId), new MySqlParameter("@lastloginglobal", pdata.LastLoginGlobal.ToTimeStamp()), new MySqlParameter("@totalplaytime", pdata.TotalPlayime)));
+            
+            RequestQueryExecute(false,new Query($"INSERT INTO `{Configuration.TableNamePlayers}` (`SteamID`, `SteamName`, `CharName`, `LastQuestGroupId`, `LastQuestGroupName`, `HWID`, `IP`, `LastLoginGlobal`, `TotalPlaytime`, `LastServerId`) " +$"VALUES (@steamid, @steamname, @charname, @groupid, @groupname, @hwid, @ip, @lastloginglobal, @totalplaytime, @lastinstanceid) ON DUPLICATE KEY UPDATE `SteamName` = VALUES(`SteamName`), `CharName` = VALUES(`CharName`), `LastQuestGroupId` = VALUES(`LastQuestGroupId`), `LastQuestGroupName` = VALUES(`LastQuestGroupName`), `HWID` = VALUES(`HWID`), `IP` = VALUES(`IP`), `LastLoginGlobal` = VALUES(`LastLoginglobal`), `TotalPlaytime` = VALUES(`TotalPlaytime`), `LastServerId` = VALUES(`LastServerId`);",EQueryType.NonQuery, output =>{var indexOf = _allPlayerData.FindIndex(k => k.SteamId == pdata.SteamId);lock (_memory){if (indexOf < 0)_allPlayerData.Add(pdata);else _allPlayerData[indexOf] = pdata;}}, false, new MySqlParameter("@steamid", pdata.SteamId), new MySqlParameter("@steamname", pdata.SteamName.Truncate(200)), new MySqlParameter("@charname", pdata.CharacterName.Truncate(200)), new MySqlParameter("@groupid", pdata.LastQuestGroupId), new MySqlParameter("@groupname", pdata.GroupName),new MySqlParameter("@hwid", pdata.Hwid), new MySqlParameter("@ip", pdata.Ip), new MySqlParameter("@lastinstanceid", pdata.ServerId), new MySqlParameter("@lastloginglobal", pdata.LastLoginGlobal.ToTimeStamp()), new MySqlParameter("@totalplaytime", pdata.TotalPlaytime)));
         }
     }
 }

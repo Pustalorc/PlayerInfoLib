@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using MySql.Data.MySqlClient;
 using SDG.Unturned;
 using Steamworks;
+using UnityEngine.Networking;
 
 namespace PlayerInfoLibrary
 {
@@ -18,16 +20,56 @@ namespace PlayerInfoLibrary
                 .TotalSeconds;
         }
 
-        public static bool IsDbNull(this MySqlDataReader reader, string fieldname)
+        public static void GetGroupName(this Player player, PlayerData playerData)
         {
-            return reader.IsDBNull(reader.GetOrdinal(fieldname));
+            var group = player.quests.groupID;
+
+            if (group.ToString().Length == 18)
+            {
+                PlayerInfoLib.Instance.StartCoroutine(SteamGroupRequest(group.ToString(), playerData));
+            }
         }
 
-        public static string GetIp(this CSteamID cSteamId)
+        public static IEnumerator SteamGroupRequest(string group, PlayerData playerData)
         {
-            // Grab an active players ip address from CSteamID.
+            var www = UnityWebRequest.Get("http://steamcommunity.com/gid/" + group + "/memberslistxml?xml=1");
+            yield return www.SendWebRequest();
+
+            if (!www.isNetworkError && !www.isHttpError)
+            {
+                string result = System.Text.Encoding.UTF8.GetString(www.downloadHandler.data);
+
+                string data = result.getBetween("<groupName>", "</groupName>").Replace(" ", "");
+
+                data = data.Replace("<![CDATA[", "").Replace("]]>", "");
+
+                playerData.GroupName = data;
+                PlayerInfoLib.Instance.database.SaveToDb(playerData);
+            }
+        }
+
+        public static string getBetween(this string strSource, string strStart, string strEnd)
+        {
+            int Start, End;
+            if (strSource.Contains(strStart) && strSource.Contains(strEnd))
+            {
+                Start = strSource.IndexOf(strStart, 0) + strStart.Length;
+                End = strSource.IndexOf(strEnd, Start);
+                return strSource.Substring(Start, End - Start);
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        // Grab an active players ip address from CSteamID.
+        public static uint GetIp(this CSteamID cSteamId, uint fallback = uint.MaxValue)
+        {
             SteamGameServerNetworking.GetP2PSessionState(cSteamId, out var sessionState);
-            return Parser.getIPFromUInt32(sessionState.m_nRemoteIP);
+            if (sessionState.m_nRemoteIP == 0)
+                return fallback;
+            return sessionState.m_nRemoteIP;
         }
 
         // Returns a Steamworks.CSteamID on out from a string, and returns true if it is a CSteamID.
@@ -49,7 +91,7 @@ namespace PlayerInfoLibrary
         }
 
         // Returns formatted string with how long they've played on the server in d, h, m, s.
-        public static string FormatTotalTime(this int totalTime)
+        public static string FormatTotalTime(this ulong totalTime)
         {
             var totalTimeFormated = "";
             if (totalTime >= 60 * 60 * 24) totalTimeFormated = totalTime / (60 * 60 * 24) + "d ";

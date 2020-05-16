@@ -5,6 +5,7 @@ using Rocket.API;
 using Rocket.Unturned.Chat;
 using SDG.Unturned;
 using UnityEngine;
+using Math = System.Math;
 
 namespace PlayerInfoLibrary.Commands
 {
@@ -73,24 +74,13 @@ namespace PlayerInfoLibrary.Commands
             foreach (var pData in pInfo)
             {
                 start++;
-                if (pData.IsLocal())
-                {
-                    UnturnedChat.Say(caller,
-                        $"{start}: {(caller is ConsolePlayer ? pData.CharacterName : pData.CharacterName.Truncate(12))} [{(caller is ConsolePlayer ? pData.SteamName : pData.SteamName.Truncate(12))}] ({pData.SteamId}), IP: {pData.Ip}, Local: {pData.IsLocal()}",
-                        Color.yellow);
-                    UnturnedChat.Say(caller,
-                        $"Seen: {pData.LastLoginGlobal}, TT: {pData.TotalPlayime.FormatTotalTime()}",
-                        Color.yellow);
-                }
-                else
-                {
-                    UnturnedChat.Say(caller,
-                        $"{start}: {(caller is ConsolePlayer ? pData.CharacterName : pData.CharacterName.Truncate(12))} [{(caller is ConsolePlayer ? pData.SteamName : pData.SteamName.Truncate(12))}] ({pData.SteamId}), IP: {pData.Ip}, Local: {pData.IsLocal()}",
-                        Color.yellow);
-                    UnturnedChat.Say(caller,
-                        $"Seen: {pData.LastLoginGlobal}, TT: {pData.TotalPlayime.FormatTotalTime()}, on: {pData.LastServerId}:{pData.LastServerName}",
-                        Color.yellow);
-                }
+
+                UnturnedChat.Say(caller,
+                    $"{start}: {(caller is ConsolePlayer ? pData.CharacterName : pData.CharacterName.Truncate(12))} [{(caller is ConsolePlayer ? pData.SteamName : pData.SteamName.Truncate(12))}] ({pData.SteamId}), Group ID: {pData.LastQuestGroupId}, Group Name: {pData.GroupName}",
+                    Color.yellow);
+                UnturnedChat.Say(caller,
+                    $"Seen: {pData.LastLoginGlobal}, TT: {pData.TotalPlaytime.FormatTotalTime()}",
+                    Color.yellow);
             }
         }
     }
