@@ -19,7 +19,7 @@ namespace PlayerInfoLibrary
 
             var hwid = string.Join("", Player.SteamPlayer().playerID.hwid);
 
-            _pData = new PlayerData(Player.CSteamID, Player.SteamName, Player.CharacterName, Player.Player.quests.groupID.m_SteamID, Player.CSteamID.GetIp(pData.Ip), hwid, Provider.serverName, PlayerInfoLib.Instance.database.InstanceId, playtime, _startTime);
+            _pData = new PlayerData(Player.CSteamID, Player.SteamName, Player.CharacterName, Player.Player.quests.groupID.m_SteamID, Player.CSteamID.GetIp(pData?.Ip ?? 0), hwid, Provider.serverName, PlayerInfoLib.Instance.database.InstanceId, playtime, _startTime);
             PlayerInfoLib.Instance.database.SaveToDb(_pData);
             Player.Player.GetGroupName(_pData);
         }

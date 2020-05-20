@@ -37,6 +37,7 @@ namespace PlayerInfoLibrary
             LastQuestGroupId = groupId;
             GroupName = groupName;
             Ip = ip;
+            Hwid = hwid;
             LastLoginGlobal = lastLoginGlobal;
             ServerName = serverName;
             ServerId = serverId;
@@ -49,7 +50,9 @@ namespace PlayerInfoLibrary
             SteamName = steamName;
             CharacterName = characterName;
             LastQuestGroupId = groupId;
+            GroupName = "";
             Ip = ip;
+            Hwid = hwid;
             LastLoginGlobal = lastLoginGlobal;
             ServerName = serverName;
             ServerId = serverId;
