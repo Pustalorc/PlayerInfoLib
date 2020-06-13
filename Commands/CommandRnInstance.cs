@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using Rocket.API;
 using Rocket.Unturned.Chat;
 
@@ -7,13 +8,13 @@ namespace PlayerInfoLibrary.Commands
     public class CommandRnInstance : IRocketCommand
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Console;
-        public string Name => "rnint";
-        public string Help => "Renames this instance in the database.";
-        public string Syntax => "<InstanceName>";
-        public List<string> Aliases => new List<string>();
-        public List<string> Permissions => new List<string> {"PlayerInfoLib.rnint"};
+        [NotNull] public string Name => "rnint";
+        [NotNull] public string Help => "Renames this instance in the database.";
+        [NotNull] public string Syntax => "<InstanceName>";
+        [NotNull] public List<string> Aliases => new List<string>();
+        [NotNull] public List<string> Permissions => new List<string> {"PlayerInfoLib.rnint"};
 
-        public void Execute(IRocketPlayer caller, string[] command)
+        public void Execute(IRocketPlayer caller, [NotNull] string[] command)
         {
             switch (command.Length)
             {

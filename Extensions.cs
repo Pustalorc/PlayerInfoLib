@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
-using MySql.Data.MySqlClient;
+using System.Text;
+using JetBrains.Annotations;
 using SDG.Unturned;
 using Steamworks;
 using UnityEngine.Networking;
@@ -20,14 +21,12 @@ namespace PlayerInfoLibrary
                 .TotalSeconds;
         }
 
-        public static void GetGroupName(this Player player, PlayerData playerData)
+        public static void GetGroupName([NotNull] this Player player, PlayerData playerData)
         {
             var group = player.quests.groupID;
 
             if (group.ToString().Length == 18)
-            {
                 PlayerInfoLib.Instance.StartCoroutine(SteamGroupRequest(group.ToString(), playerData));
-            }
         }
 
         public static IEnumerator SteamGroupRequest(string group, PlayerData playerData)
@@ -35,41 +34,33 @@ namespace PlayerInfoLibrary
             var www = UnityWebRequest.Get("http://steamcommunity.com/gid/" + group + "/memberslistxml?xml=1");
             yield return www.SendWebRequest();
 
-            if (!www.isNetworkError && !www.isHttpError)
-            {
-                string result = System.Text.Encoding.UTF8.GetString(www.downloadHandler.data);
+            if (www.isNetworkError || www.isHttpError) yield break;
 
-                string data = result.getBetween("<groupName>", "</groupName>").Replace(" ", "");
+            var result = Encoding.UTF8.GetString(www.downloadHandler.data);
 
-                data = data.Replace("<![CDATA[", "").Replace("]]>", "");
+            var data = result.GetBetween("<groupName>", "</groupName>").Replace(" ", "");
 
-                playerData.GroupName = data;
-                PlayerInfoLib.Instance.database.SaveToDb(playerData);
-            }
+            data = data.Replace("<![CDATA[", "").Replace("]]>", "");
+
+            playerData.GroupName = data;
+            PlayerInfoLib.Instance.database.SaveToDb(playerData);
         }
 
-        public static string getBetween(this string strSource, string strStart, string strEnd)
+        [NotNull]
+        public static string GetBetween([NotNull] this string strSource, [NotNull] string strStart, string strEnd)
         {
-            int Start, End;
-            if (strSource.Contains(strStart) && strSource.Contains(strEnd))
-            {
-                Start = strSource.IndexOf(strStart, 0) + strStart.Length;
-                End = strSource.IndexOf(strEnd, Start);
-                return strSource.Substring(Start, End - Start);
-            }
-            else
-            {
-                return "";
-            }
+            if (!strSource.Contains(strStart) || !strSource.Contains(strEnd)) return "";
+
+            var start = strSource.IndexOf(strStart, 0, StringComparison.Ordinal) + strStart.Length;
+            var end = strSource.IndexOf(strEnd, start, StringComparison.Ordinal);
+            return strSource.Substring(start, end - start);
         }
 
         // Grab an active players ip address from CSteamID.
         public static uint GetIp(this CSteamID cSteamId, uint fallback = uint.MaxValue)
         {
             SteamGameServerNetworking.GetP2PSessionState(cSteamId, out var sessionState);
-            if (sessionState.m_nRemoteIP == 0)
-                return fallback;
-            return sessionState.m_nRemoteIP;
+            return sessionState.m_nRemoteIP == 0 ? fallback : sessionState.m_nRemoteIP;
         }
 
         // Returns a Steamworks.CSteamID on out from a string, and returns true if it is a CSteamID.
@@ -83,7 +74,8 @@ namespace PlayerInfoLibrary
             return true;
         }
 
-        public static string Truncate(this string value, int maxLength)
+        [CanBeNull]
+        public static string Truncate([CanBeNull] this string value, int maxLength)
         {
             if (string.IsNullOrEmpty(value)) return value;
 
@@ -91,14 +83,15 @@ namespace PlayerInfoLibrary
         }
 
         // Returns formatted string with how long they've played on the server in d, h, m, s.
+        [NotNull]
         public static string FormatTotalTime(this ulong totalTime)
         {
-            var totalTimeFormated = "";
-            if (totalTime >= 60 * 60 * 24) totalTimeFormated = totalTime / (60 * 60 * 24) + "d ";
-            if (totalTime >= 60 * 60) totalTimeFormated += totalTime / (60 * 60) % 24 + "h ";
-            if (totalTime >= 60) totalTimeFormated += totalTime / 60 % 60 + "m ";
-            totalTimeFormated += totalTime % 60 + "s";
-            return totalTimeFormated;
+            var totalTimeFormatted = "";
+            if (totalTime >= 60 * 60 * 24) totalTimeFormatted = totalTime / (60 * 60 * 24) + "d ";
+            if (totalTime >= 60 * 60) totalTimeFormatted += totalTime / (60 * 60) % 24 + "h ";
+            if (totalTime >= 60) totalTimeFormatted += totalTime / 60 % 60 + "m ";
+            totalTimeFormatted += totalTime % 60 + "s";
+            return totalTimeFormatted;
         }
     }
 }

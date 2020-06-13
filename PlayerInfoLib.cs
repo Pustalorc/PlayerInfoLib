@@ -1,4 +1,5 @@
-﻿using PlayerInfoLibrary.Configuration;
+﻿using JetBrains.Annotations;
+using PlayerInfoLibrary.Configuration;
 using PlayerInfoLibrary.Database;
 using Rocket.API.Collections;
 using Rocket.Core.Logging;
@@ -11,12 +12,16 @@ namespace PlayerInfoLibrary
         public static PlayerInfoLib Instance;
         public DatabaseManager database;
 
+        [NotNull]
         public override TranslationList DefaultTranslations =>
             new TranslationList
             {
                 {"too_many_parameters", "Too many parameters."},
                 {"investigate_help", "<player> [page] - Returns info for players matching the search query."},
-                {"delint_help", "<InstanceId> - Uses the numerical Instance ID for a server to remove all player data saved for that server."},
+                {
+                    "delint_help",
+                    "<InstanceId> - Uses the numerical Instance ID for a server to remove all player data saved for that server."
+                },
                 {"rnint_help", "<InstanceName> - Renames this instance in the database."},
                 {"invalid_page", "Error: Invalid page number."},
                 {"number_of_records_found", "{0} Records found for: {1}, Page: {2} of {3}"},

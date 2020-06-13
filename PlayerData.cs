@@ -29,7 +29,8 @@ namespace PlayerInfoLibrary
             return SteamId != CSteamID.Nil;
         }
 
-        internal PlayerData(CSteamID steamId, string steamName, string characterName, ulong groupId, string groupName, uint ip, string hwid, string serverName, ushort serverId, ulong totalPlaytime, DateTime lastLoginGlobal)
+        internal PlayerData(CSteamID steamId, string steamName, string characterName, ulong groupId, string groupName,
+            uint ip, string hwid, string serverName, ushort serverId, ulong totalPlaytime, DateTime lastLoginGlobal)
         {
             SteamId = steamId;
             SteamName = steamName;
@@ -44,7 +45,8 @@ namespace PlayerInfoLibrary
             TotalPlaytime = totalPlaytime;
         }
 
-        internal PlayerData(CSteamID steamId, string steamName, string characterName, ulong groupId, uint ip, string hwid, string serverName, ushort serverId, ulong totalPlaytime, DateTime lastLoginGlobal)
+        internal PlayerData(CSteamID steamId, string steamName, string characterName, ulong groupId, uint ip,
+            string hwid, string serverName, ushort serverId, ulong totalPlaytime, DateTime lastLoginGlobal)
         {
             SteamId = steamId;
             SteamName = steamName;

@@ -14,6 +14,7 @@ namespace PlayerInfoLibrary.Configuration
         public string TableNameInstances { get; set; }
         public bool UseCache { get; set; }
         public ulong CacheRefreshIntervalMilliseconds { get; set; }
+        public byte CacheSize { get; set; }
 
         public void LoadDefaults()
         {
@@ -26,6 +27,7 @@ namespace PlayerInfoLibrary.Configuration
             TableNameInstances = "playerinfo_instances";
             UseCache = true;
             CacheRefreshIntervalMilliseconds = 180000;
+            CacheSize = 24;
         }
     }
 }

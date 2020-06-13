@@ -1,5 +1,6 @@
-using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using JetBrains.Annotations;
 using PlayerInfoLibrary.Database;
 using Rocket.API;
 using Rocket.Unturned.Chat;
@@ -12,13 +13,13 @@ namespace PlayerInfoLibrary.Commands
     public class CommandInvestigate : IRocketCommand
     {
         public AllowedCaller AllowedCaller => AllowedCaller.Both;
-        public string Name => "investigate";
-        public string Help => "Returns info for players matching the search query.";
-        public string Syntax => "<player> [page]";
-        public List<string> Aliases => new List<string>();
-        public List<string> Permissions => new List<string> {"PlayerInfoLib.Investigate"};
+        [NotNull] public string Name => "investigate";
+        [NotNull] public string Help => "Returns info for players matching the search query.";
+        [NotNull] public string Syntax => "<player> [page]";
+        [NotNull] public List<string> Aliases => new List<string>();
+        [NotNull] public List<string> Permissions => new List<string> {"PlayerInfoLib.Investigate"};
 
-        public void Execute(IRocketPlayer caller, string[] command)
+        public void Execute(IRocketPlayer caller, [NotNull] string[] command)
         {
             switch (command.Length)
             {
@@ -40,25 +41,25 @@ namespace PlayerInfoLibrary.Commands
             }
         }
 
-        private void PrintInformation(IRocketPlayer caller, string target, uint page = 1)
+        private static async Task PrintInformation(IRocketPlayer caller, string target, uint page = 1)
         {
-            uint totalRecods = 1;
+            const uint totalRecords = 1;
             var perPage = caller is ConsolePlayer ? 10u : 4u;
             var pInfo = new List<PlayerData>();
 
             if (target.IsCSteamId(out var cSteamId))
             {
-                var pData = PlayerInfoLib.Instance.database.QueryById(cSteamId);
+                var pData = await PlayerInfoLib.Instance.database.QueryById(cSteamId);
                 if (pData.IsValid())
                     pInfo.Add(pData);
             }
             else if (Parser.checkIP(target))
             {
-                pInfo = PlayerInfoLib.Instance.database.QueryByName(target, QueryType.Ip);
+                pInfo = await PlayerInfoLib.Instance.database.QueryByName(target, QueryType.Ip);
             }
             else
             {
-                pInfo = PlayerInfoLib.Instance.database.QueryByName(target, QueryType.Both);
+                pInfo = await PlayerInfoLib.Instance.database.QueryByName(target, QueryType.Both);
             }
 
             if (pInfo.Count <= 0)
@@ -69,8 +70,8 @@ namespace PlayerInfoLibrary.Commands
 
             var start = (page - 1) * perPage;
             UnturnedChat.Say(caller,
-                PlayerInfoLib.Instance.Translate("number_of_records_found", totalRecods, target, page,
-                    Math.Ceiling(totalRecods / (float) perPage)), Color.red);
+                PlayerInfoLib.Instance.Translate("number_of_records_found", totalRecords, target, page,
+                    Math.Ceiling(totalRecords / (float) perPage)), Color.red);
             foreach (var pData in pInfo)
             {
                 start++;
