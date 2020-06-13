@@ -158,7 +158,7 @@ namespace PlayerInfoLibrary.Database
                     EQueryType.Reader, null, true,
                     queryType == QueryType.Ip
                         ? new MySqlParameter("@name", Parser.getUInt32FromIP(playerName))
-                        : new MySqlParameter("@name", playerName)));
+                        : new MySqlParameter("@name", $"%{playerName}%")));
 
                 if (!(queryOutput.Output is List<Row> rows) || rows.Count == 0)
                     return new List<PlayerData>();
