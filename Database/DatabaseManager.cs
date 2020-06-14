@@ -22,14 +22,14 @@ namespace PlayerInfoLibrary.Database
         private Dictionary<Query, Query> CreateTableQueries => _createTableQueries ??= new Dictionary<Query, Query>
         {
             {
-                new Query($"SHOW TABLES LIKE '{Configuration.TableNamePlayers}';", EQueryType.Scalar),
-                new Query(
+                new Query(null, $"SHOW TABLES LIKE '{Configuration.TableNamePlayers}';", EQueryType.Scalar),
+                new Query(null,
                     $"CREATE TABLE `{Configuration.TableNamePlayers}` (`SteamID` BIGINT UNSIGNED NOT NULL, `SteamName` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL, `CharName` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL, `LastQuestGroupId` BIGINT UNSIGNED NOT NULL DEFAULT 0, `LastQuestGroupName` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'N/A', `HWID` varchar(255) COLLATE utf8_unicode_ci NOT NULL, `IP` INT UNSIGNED NOT NULL DEFAULT 4294967295, `LastLoginGlobal` BIGINT(32) NOT NULL, `TotalPlaytime` BIGINT UNSIGNED NOT NULL, `LastServerId` SMALLINT UNSIGNED NOT NULL, PRIMARY KEY (`SteamID`), KEY `LastServerId` (`LastServerId`), KEY `HWID` (`HWID`), KEY `IP` (`IP`));",
                     EQueryType.NonQuery)
             },
             {
-                new Query($"SHOW TABLES LIKE '{Configuration.TableNameInstances}';", EQueryType.Scalar),
-                new Query(
+                new Query(null, $"SHOW TABLES LIKE '{Configuration.TableNameInstances}';", EQueryType.Scalar),
+                new Query(null,
                     $"CREATE TABLE `{Configuration.TableNameInstances}` (`ServerID` smallint(5) unsigned NOT NULL AUTO_INCREMENT, `ServerInstance` varchar(128) COLLATE utf8_unicode_ci NOT NULL, `ServerName` varchar(60) COLLATE utf8_unicode_ci NOT NULL, PRIMARY KEY(`ServerID`), UNIQUE KEY `ServerInstance` (`ServerInstance`));",
                     EQueryType.NonQuery)
             }
@@ -67,14 +67,14 @@ namespace PlayerInfoLibrary.Database
 
         private bool GetInstanceId()
         {
-            var output = ExecuteQuery(new Query(
+            var output = ExecuteQuery(new Query(null,
                 $"SELECT `ServerID`, `ServerName` FROM `{Configuration.TableNameInstances}` WHERE `ServerInstance` = @instance;",
                 EQueryType.Reader, queryParameters: new MySqlParameter("@instance", Provider.serverID.ToLower())));
 
             var rows = (List<Row>) output.Output;
             if (rows.Count <= 0)
             {
-                ExecuteQuery(new Query(
+                ExecuteQuery(new Query(null,
                     $"INSERT INTO `{Configuration.TableNameInstances}` (`ServerInstance`, `ServerName`) VALUES (@instance, @name);",
                     EQueryType.NonQuery, null, false, new MySqlParameter("@instance", Provider.serverID.ToLower()),
                     new MySqlParameter("name", Provider.serverName)));
@@ -84,7 +84,7 @@ namespace PlayerInfoLibrary.Database
             var row = rows[0];
             if (row["ServerID"] == null)
             {
-                ExecuteQuery(new Query(
+                ExecuteQuery(new Query(null,
                     $"INSERT INTO `{Configuration.TableNameInstances}` (`ServerInstance`, `ServerName`) VALUES (@instance, @name);",
                     EQueryType.NonQuery, null, false, new MySqlParameter("@instance", Provider.serverID.ToLower()),
                     new MySqlParameter("name", Provider.serverName)));
@@ -94,7 +94,7 @@ namespace PlayerInfoLibrary.Database
             InstanceId = ushort.Parse(row["ServerID"].ToString());
 
             if (row["ServerName"].ToString() != Provider.serverName)
-                ExecuteQuery(new Query(
+                ExecuteQuery(new Query(null,
                     $"UPDATE `{Configuration.TableNameInstances}` SET `ServerName` = @servername WHERE `ServerID` = {InstanceId};",
                     EQueryType.NonQuery, queryParameters: new MySqlParameter("name", Provider.serverName)));
 
@@ -106,7 +106,7 @@ namespace PlayerInfoLibrary.Database
             if (!Initialized) return;
 
             RequestQueryExecute(false,
-                new Query(
+                new Query(null,
                     $"UPDATE `{Configuration.TableNameInstances}` SET `ServerInstance` = @name WHERE `ServerID` = @instance;",
                     EQueryType.NonQuery, callback, false, new MySqlParameter("@name", newName),
                     new MySqlParameter("@instance", InstanceId)));
@@ -116,7 +116,7 @@ namespace PlayerInfoLibrary.Database
         {
             if (Initialized)
             {
-                var queryOutput = await ExecuteQueryAsync(new Query(
+                var queryOutput = await ExecuteQueryAsync(new Query(steamId,
                     "SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.LastQuestGroupId, t1.LastQuestGroupName, t1.HWID, t1.IP, t1.LastLoginGlobal, t1.TotalPlaytime, " +
                     $"t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 " +
                     $"LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerId=t2.ServerID WHERE `SteamID`=@steamId;",
@@ -151,7 +151,7 @@ namespace PlayerInfoLibrary.Database
                     _ => ""
                 };
 
-                var queryOutput = await ExecuteQueryAsync(new Query(
+                var queryOutput = await ExecuteQueryAsync(new Query(playerName,
                     "SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.LastQuestGroupId, t1.LastQuestGroupName, t1.HWID, t1.IP, t1.LastLoginGlobal, t1.TotalPlaytime, " +
                     $"t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 " +
                     $"LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerId=t2.ServerID {whereClause};",
@@ -185,7 +185,7 @@ namespace PlayerInfoLibrary.Database
             if (!Initialized) return;
 
             RequestQueryExecute(false,
-                new Query($"DELETE FROM `{Configuration.TableNameInstances}` WHERE ServerID = {instanceId};",
+                new Query(null, $"DELETE FROM `{Configuration.TableNameInstances}` WHERE ServerID = {instanceId};",
                     EQueryType.NonQuery, callback));
         }
 
@@ -204,9 +204,13 @@ namespace PlayerInfoLibrary.Database
             }
 
             RequestQueryExecute(false,
-                new Query(
+                new Query(null,
                     $"INSERT INTO `{Configuration.TableNamePlayers}` (`SteamID`, `SteamName`, `CharName`, `LastQuestGroupId`, `LastQuestGroupName`, `HWID`, `IP`, `LastLoginGlobal`, `TotalPlaytime`, `LastServerId`) VALUES (@steamid, @steamname, @charname, @groupid, @groupname, @hwid, @ip, @lastloginglobal, @totalplaytime, @lastinstanceid) ON DUPLICATE KEY UPDATE `SteamName` = VALUES(`SteamName`), `CharName` = VALUES(`CharName`), `LastQuestGroupId` = VALUES(`LastQuestGroupId`), `LastQuestGroupName` = VALUES(`LastQuestGroupName`), `HWID` = VALUES(`HWID`), `IP` = VALUES(`IP`), `LastLoginGlobal` = VALUES(`LastLoginglobal`), `TotalPlaytime` = VALUES(`TotalPlaytime`), `LastServerId` = VALUES(`LastServerId`);",
-                    EQueryType.NonQuery, null, false, new MySqlParameter("@steamid", pdata.SteamId),
+                    EQueryType.NonQuery, output => ExecuteTransaction(new Query(pdata.SteamId,
+                        "SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.LastQuestGroupId, t1.LastQuestGroupName, t1.HWID, t1.IP, t1.LastLoginGlobal, t1.TotalPlaytime, " +
+                        $"t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 " +
+                        $"LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerId=t2.ServerID WHERE `SteamID`=@steamId;",
+                        EQueryType.Reader, null, true, new MySqlParameter("@steamId", pdata.SteamId))), false, new MySqlParameter("@steamid", pdata.SteamId),
                     new MySqlParameter("@steamname", pdata.SteamName.Truncate(200)),
                     new MySqlParameter("@charname", pdata.CharacterName.Truncate(200)),
                     new MySqlParameter("@groupid", pdata.LastQuestGroupId),
