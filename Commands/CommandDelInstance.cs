@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Rocket.API;
+using Rocket.Core.Utils;
 using Rocket.Unturned.Chat;
 
 namespace PlayerInfoLibrary.Commands
@@ -30,7 +31,8 @@ namespace PlayerInfoLibrary.Commands
                     }
 
                     PlayerInfoLib.Instance.database.RemoveInstance(id,
-                        output => UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("delint_success")));
+                        output => TaskDispatcher.QueueOnMainThread(() =>
+                            UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("delint_success"))));
                     break;
                 default:
                     UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("delint_help"));

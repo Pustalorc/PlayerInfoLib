@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Rocket.API;
+using Rocket.Core.Utils;
 using Rocket.Unturned.Chat;
 
 namespace PlayerInfoLibrary.Commands
@@ -21,7 +22,8 @@ namespace PlayerInfoLibrary.Commands
                 case 1:
                     var newName = command[0].ToLower();
                     PlayerInfoLib.Instance.database.SetInstanceName(newName,
-                        output => UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_success")));
+                        output => TaskDispatcher.QueueOnMainThread(() =>
+                            UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_success"))));
                     break;
                 default:
                     UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("rnint_help"));
