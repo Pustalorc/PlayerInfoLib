@@ -10,11 +10,12 @@ namespace PlayerInfoLibrary.Configuration
         public string DatabaseUsername { get; set; }
         public string DatabasePassword { get; set; }
         public string DatabaseName { get; set; }
+        public string ConnectionStringExtras { get; set; }
         public string TableNamePlayers { get; set; }
         public string TableNameInstances { get; set; }
         public bool UseCache { get; set; }
-        public ulong CacheRefreshIntervalMilliseconds { get; set; }
-        public byte CacheSize { get; set; }
+        public double CacheRefreshRequestInterval { get; set; }
+        public ulong CacheSize { get; set; }
 
         public void LoadDefaults()
         {
@@ -23,10 +24,11 @@ namespace PlayerInfoLibrary.Configuration
             DatabaseUsername = "unturned";
             DatabasePassword = "password";
             DatabaseName = "unturned";
+            ConnectionStringExtras = "";
             TableNamePlayers = "playerinfo";
             TableNameInstances = "playerinfo_instances";
             UseCache = true;
-            CacheRefreshIntervalMilliseconds = 180000;
+            CacheRefreshRequestInterval = 180000;
             CacheSize = 24;
         }
     }

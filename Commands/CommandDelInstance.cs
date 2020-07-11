@@ -1,7 +1,7 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Rocket.API;
-using Rocket.Core.Utils;
 using Rocket.Unturned.Chat;
 
 namespace PlayerInfoLibrary.Commands
@@ -30,14 +30,18 @@ namespace PlayerInfoLibrary.Commands
                         return;
                     }
 
-                    PlayerInfoLib.Instance.database.RemoveInstance(id,
-                        output => TaskDispatcher.QueueOnMainThread(() =>
-                            UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("delint_success"))));
+                    GetAndDisplayResult(caller, id);
                     break;
                 default:
                     UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("delint_help"));
                     break;
             }
+        }
+
+        public static async Task GetAndDisplayResult(IRocketPlayer caller, ushort id)
+        {
+            var output = await PlayerInfoLib.Instance.database.RemoveInstance(id);
+            UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate(output ? "delint_success" : "delint_not_found"));
         }
     }
 }

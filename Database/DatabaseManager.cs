@@ -67,16 +67,17 @@ namespace PlayerInfoLibrary.Database
 
         private bool GetInstanceId()
         {
-            var output = ExecuteQuery(new Query(
-                $"SELECT `ServerID`, `ServerName` FROM `{Configuration.TableNameInstances}` WHERE `ServerInstance` = @instance;",
-                EQueryType.Reader, queryParameters: new MySqlParameter("@instance", Provider.serverID.ToLower())));
+            var output =
+                ExecuteQuery(new Query(
+                    $"SELECT `ServerID`, `ServerName` FROM `{Configuration.TableNameInstances}` WHERE `ServerInstance` = @instance;",
+                    EQueryType.Reader, new MySqlParameter("@instance", Provider.serverID.ToLower())));
 
             var rows = (List<Row>) output.Output;
             if (rows.Count <= 0)
             {
                 ExecuteQuery(new Query(
                     $"INSERT INTO `{Configuration.TableNameInstances}` (`ServerInstance`, `ServerName`) VALUES (@instance, @name);",
-                    EQueryType.NonQuery, null, false, new MySqlParameter("@instance", Provider.serverID.ToLower()),
+                    EQueryType.NonQuery, new MySqlParameter("@instance", Provider.serverID.ToLower()),
                     new MySqlParameter("name", Provider.serverName)));
                 return false;
             }
@@ -84,8 +85,9 @@ namespace PlayerInfoLibrary.Database
             var row = rows[0];
             if (row["ServerID"] == null)
             {
-                ExecuteQuery(new Query($"INSERT INTO `{Configuration.TableNameInstances}` (`ServerInstance`, `ServerName`) VALUES (@instance, @name);",
-                    EQueryType.NonQuery, null, false, new MySqlParameter("@instance", Provider.serverID.ToLower()),
+                ExecuteQuery(new Query(
+                    $"INSERT INTO `{Configuration.TableNameInstances}` (`ServerInstance`, `ServerName`) VALUES (@instance, @name);",
+                    EQueryType.NonQuery, new MySqlParameter("@instance", Provider.serverID.ToLower()),
                     new MySqlParameter("name", Provider.serverName)));
                 return false;
             }
@@ -93,34 +95,33 @@ namespace PlayerInfoLibrary.Database
             InstanceId = ushort.Parse(row["ServerID"].ToString());
 
             if (row["ServerName"].ToString() != Provider.serverName)
-                ExecuteQuery(new Query($"UPDATE `{Configuration.TableNameInstances}` SET `ServerName` = @servername WHERE `ServerID` = {InstanceId};",
-                    EQueryType.NonQuery, queryParameters: new MySqlParameter("name", Provider.serverName)));
+                ExecuteQuery(new Query(
+                    $"UPDATE `{Configuration.TableNameInstances}` SET `ServerName` = @servername WHERE `ServerID` = {InstanceId};",
+                    EQueryType.NonQuery, new MySqlParameter("name", Provider.serverName)));
 
             return true;
         }
-
-        public void SetInstanceName(string newName, QueryCallback callback)
+        public async Task<bool> SetInstanceName(string newName)
         {
-            if (!Initialized) return;
+            if (!Initialized) return false;
 
-            RequestQueryExecute(false,
-                new Query($"UPDATE `{Configuration.TableNameInstances}` SET `ServerInstance` = @name WHERE `ServerID` = @instance;",
-                    EQueryType.NonQuery, callback, false, new MySqlParameter("@name", newName),
-                    new MySqlParameter("@instance", InstanceId)));
+            var output = await ExecuteQueryAsync(new Query($"UPDATE `{Configuration.TableNameInstances}` SET `ServerName`=@name WHERE `ServerID`=@instance;", EQueryType.NonQuery, new MySqlParameter("@name", newName), new MySqlParameter("@instance", InstanceId)));
+
+            return output.Output is int changes && changes >= 1;
         }
 
         public async Task<PlayerData> QueryById(CSteamID steamId)
         {
             if (Initialized)
             {
-                var queryOutput = await ExecuteQueryAsync(new Query(
-                    "SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.LastQuestGroupId, t1.LastQuestGroupName, t1.HWID, t1.IP, t1.LastLoginGlobal, t1.TotalPlaytime, " +
-                    $"t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 " +
-                    $"LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerId=t2.ServerID WHERE `SteamID`=@steamId;",
-                    EQueryType.Reader, null, true, new MySqlParameter("@steamId", steamId)));
+                var queryOutput = await ExecuteQueryAsync(
+                    new Query(steamId,
+                        "SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.LastQuestGroupId, t1.LastQuestGroupName, t1.HWID, t1.IP, t1.LastLoginGlobal, t1.TotalPlaytime, " +
+                        $"t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 " +
+                        $"LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerId=t2.ServerID WHERE `SteamID`=@steamId;",
+                        EQueryType.Reader, true, new MySqlParameter("@steamId", steamId)));
 
-                if (!(queryOutput.Output is List<Row> rows) || rows.Count == 0)
-                    return null;
+                if (!(queryOutput.Output is List<Row> rows) || rows.Count == 0) return null;
 
                 return BuildPlayerData(rows[0]);
             }
@@ -152,7 +153,7 @@ namespace PlayerInfoLibrary.Database
                     "SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.LastQuestGroupId, t1.LastQuestGroupName, t1.HWID, t1.IP, t1.LastLoginGlobal, t1.TotalPlaytime, " +
                     $"t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 " +
                     $"LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerId=t2.ServerID {whereClause};",
-                    EQueryType.Reader, null, false,
+                    EQueryType.Reader,
                     queryType == QueryType.Ip
                         ? new MySqlParameter("@name", Parser.getUInt32FromIP(playerName))
                         : new MySqlParameter("@name", $"%{playerName}%")));
@@ -177,16 +178,18 @@ namespace PlayerInfoLibrary.Database
                 long.Parse(row["LastLoginGlobal"].ToString()).FromTimeStamp());
         }
 
-        public void RemoveInstance(ushort instanceId, QueryCallback callback)
+        public async Task<bool> RemoveInstance(ushort instanceId)
         {
-            if (!Initialized) return;
+            if (!Initialized) return false;
 
-            RequestQueryExecute(false,
-                new Query($"DELETE FROM `{Configuration.TableNameInstances}` WHERE ServerID = {instanceId};",
-                    EQueryType.NonQuery, callback));
+            var output = await ExecuteQueryAsync(new Query(
+                $"DELETE FROM `{Configuration.TableNameInstances}` WHERE ServerID = {instanceId};",
+                EQueryType.NonQuery));
+
+            return output.Output is int changes && changes >= 1;
         }
 
-        public void SaveToDb(PlayerData pdata)
+        public async Task SaveToDb(PlayerData pdata)
         {
             if (!Initialized)
             {
@@ -200,23 +203,22 @@ namespace PlayerInfoLibrary.Database
                 return;
             }
 
-            RequestQueryExecute(false,
-                new Query(
-                    $"INSERT INTO `{Configuration.TableNamePlayers}` (`SteamID`, `SteamName`, `CharName`, `LastQuestGroupId`, `LastQuestGroupName`, `HWID`, `IP`, `LastLoginGlobal`, `TotalPlaytime`, `LastServerId`) VALUES (@steamid, @steamname, @charname, @groupid, @groupname, @hwid, @ip, @lastloginglobal, @totalplaytime, @lastinstanceid) ON DUPLICATE KEY UPDATE `SteamName` = VALUES(`SteamName`), `CharName` = VALUES(`CharName`), `LastQuestGroupId` = VALUES(`LastQuestGroupId`), `LastQuestGroupName` = VALUES(`LastQuestGroupName`), `HWID` = VALUES(`HWID`), `IP` = VALUES(`IP`), `LastLoginGlobal` = VALUES(`LastLoginglobal`), `TotalPlaytime` = VALUES(`TotalPlaytime`), `LastServerId` = VALUES(`LastServerId`);",
-                    EQueryType.NonQuery,
-                    output => ExecuteTransaction(new Query(
-                        "SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.LastQuestGroupId, t1.LastQuestGroupName, t1.HWID, t1.IP, t1.LastLoginGlobal, t1.TotalPlaytime, " +
-                        $"t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 " +
-                        $"LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerId=t2.ServerID WHERE `SteamID`=@steamId;",
-                        EQueryType.Reader, null, true, new MySqlParameter("@steamId", pdata.SteamId))), false,
-                    new MySqlParameter("@steamid", pdata.SteamId),
-                    new MySqlParameter("@steamname", pdata.SteamName.Truncate(200)),
-                    new MySqlParameter("@charname", pdata.CharacterName.Truncate(200)),
-                    new MySqlParameter("@groupid", pdata.LastQuestGroupId),
-                    new MySqlParameter("@groupname", pdata.GroupName), new MySqlParameter("@hwid", pdata.Hwid),
-                    new MySqlParameter("@ip", pdata.Ip), new MySqlParameter("@lastinstanceid", pdata.ServerId),
-                    new MySqlParameter("@lastloginglobal", pdata.LastLoginGlobal.ToTimeStamp()),
-                    new MySqlParameter("@totalplaytime", pdata.TotalPlaytime)));
+            await ExecuteQueryAsync(new Query(
+                $"INSERT INTO `{Configuration.TableNamePlayers}` (`SteamID`, `SteamName`, `CharName`, `LastQuestGroupId`, `LastQuestGroupName`, `HWID`, `IP`, `LastLoginGlobal`, `TotalPlaytime`, `LastServerId`) VALUES (@steamid, @steamname, @charname, @groupid, @groupname, @hwid, @ip, @lastloginglobal, @totalplaytime, @lastinstanceid) ON DUPLICATE KEY UPDATE `SteamName` = VALUES(`SteamName`), `CharName` = VALUES(`CharName`), `LastQuestGroupId` = VALUES(`LastQuestGroupId`), `LastQuestGroupName` = VALUES(`LastQuestGroupName`), `HWID` = VALUES(`HWID`), `IP` = VALUES(`IP`), `LastLoginGlobal` = VALUES(`LastLoginglobal`), `TotalPlaytime` = VALUES(`TotalPlaytime`), `LastServerId` = VALUES(`LastServerId`);",
+                EQueryType.NonQuery, new MySqlParameter("@steamid", pdata.SteamId),
+                new MySqlParameter("@steamname", pdata.SteamName.Truncate(200)),
+                new MySqlParameter("@charname", pdata.CharacterName.Truncate(200)),
+                new MySqlParameter("@groupid", pdata.LastQuestGroupId),
+                new MySqlParameter("@groupname", pdata.GroupName), new MySqlParameter("@hwid", pdata.Hwid),
+                new MySqlParameter("@ip", pdata.Ip), new MySqlParameter("@lastinstanceid", pdata.ServerId),
+                new MySqlParameter("@lastloginglobal", pdata.LastLoginGlobal.ToTimeStamp()),
+                new MySqlParameter("@totalplaytime", pdata.TotalPlaytime)));
+
+            await RequestCacheUpdateAsync(new Query(pdata.SteamId,
+                "SELECT t1.SteamID, t1.SteamName, t1.CharName, t1.LastQuestGroupId, t1.LastQuestGroupName, t1.HWID, t1.IP, t1.LastLoginGlobal, t1.TotalPlaytime, " +
+                $"t2.ServerID AS LastServerID, t2.ServerName AS LastServerName FROM `{Configuration.TableNamePlayers}` as t1 " +
+                $"LEFT JOIN `{Configuration.TableNameInstances}` as t2 ON t1.LastServerId=t2.ServerID WHERE `SteamID`=@steamId;",
+                EQueryType.Reader, true, new MySqlParameter("@steamId", pdata.SteamId)));
         }
     }
 }
