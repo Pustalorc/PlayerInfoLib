@@ -17,25 +17,28 @@ namespace PlayerInfoLibrary
             new TranslationList
             {
                 {"too_many_parameters", "Too many parameters."},
-                {"investigate_help", "<player> [page] - Returns info for players matching the search query."},
+                {"investigate_help", "/investigate <player> [page] - Returns info for players matching the search query."},
                 {
                     "delint_help",
-                    "<InstanceId> - Uses the numerical Instance ID for a server to remove all player data saved for that server."
+                    "/delint <InstanceId> - Uses the numerical Instance ID for a server to remove all player data saved for that server."
                 },
-                {"rnint_help", "<InstanceName> - Renames this instance in the database."},
+                {"rnint_help", "/rnint <InstanceName> - Renames this instance in the database."},
                 {"invalid_page", "Error: Invalid page number."},
                 {"number_of_records_found", "{0} Records found for: {1}, Page: {2} of {3}"},
                 {"delint_invalid", "Error: Invalid Instance ID."},
                 {"delint_not_found", "Error: Failed to find Instance ID in the database."},
                 {
-                    "delint_success",
-                    "Successfully Removed all data for this Instance ID, if you removed the data for this server, you will need to reload the plugin for it to be operational again."
-                },
-                {
                     "rnint_success",
                     "Successfully changed the instance name for this server in the Database, Server should be restarted now."
                 },
-                {"rnint_not_found", "Error: Failed to set the new instance name to the Database."}
+                {
+                    "rnint_fail",
+                    "Error: Failed to change the instance name in the database."
+                },
+                {
+                    "delint_success",
+                    "Successfully Removed all data for this Instance ID, if you removed the data for this server, you will need to reload the plugin for it to be operational again."
+                }
             };
 
         protected override void Load()
