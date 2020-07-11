@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -50,7 +51,8 @@ namespace PlayerInfoLibrary.Commands
             if (target.IsCSteamId(out var cSteamId))
             {
                 var pData = await PlayerInfoLib.Instance.database.QueryById(cSteamId);
-                if (pData.IsValid())
+
+                if (pData?.IsValid() == true)
                     pInfo.Add(pData);
             }
             else if (Parser.checkIP(target))
