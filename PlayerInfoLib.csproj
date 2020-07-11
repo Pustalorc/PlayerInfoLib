@@ -69,6 +69,12 @@
     <Reference Include="MySql.Data, Version=8.0.20.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <HintPath>packages\MySql.Data.8.0.20\lib\net452\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="Pustalorc.FrequencyCache, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Pustalorc.FrequencyCache.1.0.2\lib\net461\Pustalorc.FrequencyCache.dll</HintPath>
+    </Reference>
+    <Reference Include="Pustalorc.MySqlConnectorWrapper, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\Pustalorc.MySqlConnectorWrapper.2.2.1\lib\net461\Pustalorc.MySqlConnectorWrapper.dll</HintPath>
+    </Reference>
     <Reference Include="Renci.SshNet, Version=2016.1.0.0, Culture=neutral, PublicKeyToken=1cee9f8bde3db106, processorArchitecture=MSIL">
       <HintPath>packages\SSH.NET.2016.1.0\lib\net40\Renci.SshNet.dll</HintPath>
     </Reference>
@@ -169,12 +175,6 @@
     <Content Include="Libraries\System.Transactions.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="MySqlConnectorWrapper\MySqlConnectorWrapper\MySqlConnectorWrapper.csproj">
-      <Project>{9b04b44d-d7c0-4798-bf80-69e1581dd910}</Project>
-      <Name>MySqlConnectorWrapper</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
