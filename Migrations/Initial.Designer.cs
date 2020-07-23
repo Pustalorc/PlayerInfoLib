@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pustalorc.PlayerInfoLib.Unturned;
+using Pustalorc.PlayerInfoLib.Unturned.Database;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
 {
