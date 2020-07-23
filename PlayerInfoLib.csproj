@@ -3,13 +3,19 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
-	<PackageTags>openmod openmod-plugin unturned</PackageTags>
-	<RootNamespace>Pustalorc.PlayerInfoLib</RootNamespace>
+	  <PackageTags>openmod openmod-plugin unturned</PackageTags>
+	  <RootNamespace>Pustalorc.PlayerInfoLib.Unturned</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateNugetPackage>true</GenerateNugetPackage>
     <Product>Player Info Library</Product>
-    <AssemblyName>Pustalorc.PlayerInfoLib</AssemblyName>
+    <AssemblyName>Pustalorc.PlayerInfoLib.Unturned</AssemblyName>
     <LangVersion>8</LangVersion>
+    <Description>A library to store more information about unturned players.</Description>
+    <PackageReleaseNotes>First release</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib/tree/OpenMod</RepositoryUrl>
+    <RepositoryType>Github</RepositoryType>
+    <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib/tree/OpenMod</PackageProjectUrl>
+    <Copyright>Copyright © 2020 Pustalorc</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,5 +50,9 @@
   <ItemGroup>
     <EmbeddedResource Include="config.yaml" />
     <EmbeddedResource Include="translations.yaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Commands\" />
   </ItemGroup>
 </Project>
