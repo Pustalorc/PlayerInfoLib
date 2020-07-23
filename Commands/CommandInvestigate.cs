@@ -1,89 +1,70 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Localization;
+using OpenMod.Core.Commands;
+using Pustalorc.PlayerInfoLib.Unturned.Database;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
-using PlayerInfoLibrary.Database;
-using Rocket.API;
-using Rocket.Unturned.Chat;
-using SDG.Unturned;
-using UnityEngine;
-using Math = System.Math;
 
-namespace PlayerInfoLibrary.Commands
+namespace Pustalorc.PlayerInfoLib.Unturned.Commands
 {
-    public class CommandInvestigate : IRocketCommand
+    [Command("investigate")]
+    [CommandSyntax("<player>")]
+    [CommandDescription("Renames the current instance in the DB ")]
+    public class CommandInvestigate : Command
     {
-        public AllowedCaller AllowedCaller => AllowedCaller.Both;
-        [NotNull] public string Name => "investigate";
-        [NotNull] public string Help => "Returns info for players matching the search query.";
-        [NotNull] public string Syntax => "<player> [page]";
-        [NotNull] public List<string> Aliases => new List<string>();
-        [NotNull] public List<string> Permissions => new List<string> {"PlayerInfoLib.Investigate"};
+        private readonly IStringLocalizer m_StringLocalizer;
+        private readonly PlayerInfoLibDbContext m_DbContext;
 
-        public void Execute(IRocketPlayer caller, [NotNull] string[] command)
+        public CommandInvestigate(IServiceProvider serviceProvider, IStringLocalizer stringLocalizer,
+            PlayerInfoLibDbContext dbContext) : base(serviceProvider)
         {
-            switch (command.Length)
-            {
-                case 1:
-                    PrintInformation(caller, command[0]);
-                    break;
-                case 2:
-                    if (!uint.TryParse(command[1], out var page))
-                    {
-                        UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("invalid_page"));
-                        break;
-                    }
-
-                    PrintInformation(caller, command[0], page);
-                    break;
-                default:
-                    UnturnedChat.Say(caller, PlayerInfoLib.Instance.Translate("investigate_help"));
-                    break;
-            }
+            m_DbContext = dbContext;
+            m_StringLocalizer = stringLocalizer;
         }
 
-        private static async Task PrintInformation(IRocketPlayer caller, string target, uint page = 1)
+        protected override async Task OnExecuteAsync()
         {
-            const uint totalRecords = 1;
-            var perPage = caller is ConsolePlayer ? 10u : 4u;
-            var pInfo = new List<PlayerData>();
+            var actor = Context.Actor;
+            var targetPlayer = await Context.Parameters.GetAsync<string>(0);
 
-            if (target.IsCSteamId(out var cSteamId))
-            {
-                var pData = await PlayerInfoLib.Instance.database.QueryById(cSteamId);
+            var players = new List<PlayerData>();
 
-                if (pData?.IsValid() == true)
-                    pInfo.Add(pData);
-            }
-            else if (Parser.checkIP(target))
+            if (ulong.TryParse(targetPlayer, out var id) && id >= 76561197960265728 && id <= 103582791429521408)
             {
-                pInfo = await PlayerInfoLib.Instance.database.QueryByName(target, QueryType.Ip);
+                var data = await m_DbContext.Players.FirstOrDefaultAsync(k => k.Id == id);
+
+                if (data != null)
+                    players.Add(data);
             }
             else
             {
-                pInfo = await PlayerInfoLib.Instance.database.QueryByName(target, QueryType.Both);
+                var data = m_DbContext.Players.Where(k =>
+                    k.CharacterName.ToLower().Contains(targetPlayer.ToLower()) ||
+                    k.SteamName.ToLower().Contains(targetPlayer.ToLower()));
+
+                if (data.Any())
+                    players.AddRange(data);
             }
 
-            if (pInfo.Count <= 0)
+            if (players.Count == 0)
             {
-                UnturnedChat.Say(caller, "No players found by that name.");
-                return;
+                await actor.PrintMessageAsync(m_StringLocalizer["investigate:no_results", new {Target = targetPlayer}]);
             }
-
-            var start = (page - 1) * perPage;
-            UnturnedChat.Say(caller,
-                PlayerInfoLib.Instance.Translate("number_of_records_found", totalRecords, target, page,
-                    Math.Ceiling(totalRecords / (float) perPage)), Color.red);
-            foreach (var pData in pInfo)
+            else
             {
-                start++;
+                await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_count", new {players.Count}]);
+                var firstResult = players.First();
+                var server = await m_DbContext.Servers.FirstOrDefaultAsync(k => k.Id == firstResult.ServerId);
+                var timeSpan = TimeSpan.FromSeconds(firstResult.TotalPlaytime);
 
-                UnturnedChat.Say(caller,
-                    $"{start}: {(caller is ConsolePlayer ? pData.CharacterName : pData.CharacterName.Truncate(12))} [{(caller is ConsolePlayer ? pData.SteamName : pData.SteamName.Truncate(12))}] ({pData.SteamId}), Group ID: {pData.LastQuestGroupId}, Group Name: {pData.GroupName}",
-                    Color.yellow);
-                UnturnedChat.Say(caller,
-                    $"Seen: {pData.LastLoginGlobal}, TT: {pData.TotalPlaytime.FormatTotalTime()}",
-                    Color.yellow);
+                await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_text",
+                    new
+                    {
+                        Data = firstResult, ServerName = server.Name ?? "",
+                        TotalPlaytimeFormatted = m_StringLocalizer["timestamp_format", new {Span = timeSpan}]
+                    }]);
             }
         }
     }
