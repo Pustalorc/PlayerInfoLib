@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using OpenMod.EntityFrameworkCore;
 
-namespace Pustalorc.PlayerInfoLib.Unturned
+namespace Pustalorc.PlayerInfoLib.Unturned.Database
 {
     public class PlayerInfoLibDbContext : OpenModDbContext<PlayerInfoLibDbContext>
     {

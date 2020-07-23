@@ -3,19 +3,28 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Pustalorc.PlayerInfoLib.Unturned
+namespace Pustalorc.PlayerInfoLib.Unturned.Database
 {
     public class PlayerData
     {
-        [Column("Id", TypeName = "BIGINT UNSIGNED")] [Key] [Required] public ulong Id { get; set; }
+        [Column("Id", TypeName = "BIGINT UNSIGNED")]
+        [Key]
+        [Required]
+        public ulong Id { get; set; }
 
         [Required] [StringLength(64)] public string SteamName { get; set; }
 
         [Required] [StringLength(64)] public string CharacterName { get; set; }
 
-        [Column("LastQuestGroupId", TypeName = "BIGINT UNSIGNED")] [Required] [DefaultValue(0)] public ulong LastQuestGroupId { get; set; }
+        [Column("LastQuestGroupId", TypeName = "BIGINT UNSIGNED")]
+        [Required]
+        [DefaultValue(0)]
+        public ulong LastQuestGroupId { get; set; }
 
-        [Column("SteamGroup", TypeName = "BIGINT UNSIGNED")] [Required] [DefaultValue(0)] public ulong SteamGroup { get; set; }
+        [Column("SteamGroup", TypeName = "BIGINT UNSIGNED")]
+        [Required]
+        [DefaultValue(0)]
+        public ulong SteamGroup { get; set; }
 
         [Required]
         [StringLength(64)]
