@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OpenMod.API.Eventing;
@@ -120,6 +119,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             await m_DbContext.SaveChangesAsync();
         }
 
+        [ItemNotNull]
         private async Task<string> GetProfilePictureHash(CSteamID user)
         {
             var apiKey = m_Configuration["steamWebApiKey"];
@@ -128,11 +128,14 @@ namespace Pustalorc.PlayerInfoLib.Unturned
 
             using var web = new WebClient();
             var result =
-                await web.DownloadStringTaskAsync($"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={apiKey}&steamids={user.m_SteamID}");
+                await web.DownloadStringTaskAsync(
+                    $"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={apiKey}&steamids={user.m_SteamID}");
 
             var deserialized = JsonConvert.DeserializeObject<PlayerSummaries>(result);
 
-            return deserialized.response.players.FirstOrDefault(k => k.steamid.Equals(user.ToString(), StringComparison.Ordinal))?.avatarhash ?? "";
+            return deserialized.response.players
+                       .FirstOrDefault(k => k.steamid.Equals(user.ToString(), StringComparison.Ordinal))?.avatarhash ??
+                   "";
         }
 
         [ItemNotNull]

@@ -3,8 +3,8 @@
 
 namespace Pustalorc.PlayerInfoLib.Unturned.SteamWebApiClasses
 {
-    public class PlayerSummaries
+    public class Response
     {
-        public Response response { get; set; }
+        public Player[] players { get; set; }
     }
 }
