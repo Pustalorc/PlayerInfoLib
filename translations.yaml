@@ -1,0 +1,5 @@
+timestamp_format: "{Span.Days}d {Span.Hours}h {Span.Minutes}m {Span.Seconds}s {Span.Milliseconds}ms"
+investigate:
+  no_results: "No results were found for {Target}."
+  result_count: "A total of {Count} player data was found."
+  result_text: "Best result: {Data.CharacterName} [{Data.SteamName}] ({Data.Id}), Group: {Data.SteamGroupName} [{Data.SteamGroup}], Last login: {Data.LastLoginGlobal} on {ServerName} [{Data.ServerId}], Total Playtime: {TotalPlaytimeFormatted}"
