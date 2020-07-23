@@ -5,11 +5,13 @@ using Microsoft.Extensions.Logging;
 using OpenMod.API.Plugins;
 using OpenMod.EntityFrameworkCore.Extensions;
 using OpenMod.Unturned.Plugins;
+using Pustalorc.PlayerInfoLib.Unturned.Database;
 using SDG.Unturned;
 
 [assembly:
     PluginMetadata("Pustalorc.PlayerInfoLib.Unturned", Author = "Pustalorc",
-        DisplayName = "Player Info Library Unturned", Website = "https://github.com/Pustalorc/PlayerInfoLib")]
+        DisplayName = "Player Info Library Unturned",
+        Website = "https://github.com/Pustalorc/PlayerInfoLib/tree/OpenMod")]
 
 namespace Pustalorc.PlayerInfoLib.Unturned
 {
@@ -44,9 +46,11 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             m_Logger.LogInformation("Player Info Library for Unturned by Pustalorc was loaded correctly.");
         }
 
-        protected override async UniTask OnUnloadAsync()
+        protected override UniTask OnUnloadAsync()
         {
             m_Logger.LogInformation("Player Info Library for Unturned by Pustalorc was unloaded correctly.");
+
+            return UniTask.CompletedTask;
         }
     }
 }

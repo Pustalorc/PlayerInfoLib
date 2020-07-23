@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using OpenMod.API.Eventing;
 using OpenMod.Core.Users.Events;
 using OpenMod.Unturned.Users;
+using Pustalorc.PlayerInfoLib.Unturned.Database;
 using SDG.Unturned;
 using Steamworks;
 
@@ -108,22 +109,23 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             await m_DbContext.SaveChangesAsync();
         }
 
-        private async Task<string> GetGroupName(CSteamID groupId)
+        [ItemNotNull]
+        private static async Task<string> GetGroupName(CSteamID groupId)
         {
-            using (var web = new WebClient())
-            {
-                var result = await web.DownloadStringTaskAsync("http://steamcommunity.com/gid/" + groupId + "/memberslistxml?xml=1");
+            using var web = new WebClient();
+            var result =
+                await web.DownloadStringTaskAsync("http://steamcommunity.com/gid/" + groupId +
+                                                  "/memberslistxml?xml=1");
 
-                if (!result.Contains("<groupName>") || !result.Contains("</groupName>")) return "";
+            if (!result.Contains("<groupName>") || !result.Contains("</groupName>")) return "";
 
-                var start = result.IndexOf("<groupName>", 0, StringComparison.Ordinal) + "<groupName>".Length;
-                var end = result.IndexOf("</groupName>", start, StringComparison.Ordinal);
-                
-                var data = result.Substring(start, end - start);
-                data = data.Replace(" ", "");
-                data = data.Replace("<![CDATA[", "").Replace("]]>", "");
-                return data;
-            }
+            var start = result.IndexOf("<groupName>", 0, StringComparison.Ordinal) + "<groupName>".Length;
+            var end = result.IndexOf("</groupName>", start, StringComparison.Ordinal);
+
+            var data = result.Substring(start, end - start);
+            data = data.Replace(" ", "");
+            data = data.Replace("<![CDATA[", "").Replace("]]>", "");
+            return data;
         }
     }
 }
