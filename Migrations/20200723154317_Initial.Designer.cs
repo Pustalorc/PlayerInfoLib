@@ -4,13 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Pustalorc.PlayerInfoLib.Unturned;
 using Pustalorc.PlayerInfoLib.Unturned.Database;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
 {
     [DbContext(typeof(PlayerInfoLibDbContext))]
-    [Migration("20200723110218_Initial")]
+    [Migration("20200723154317_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,7 +19,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
                 .HasAnnotation("ProductVersion", "3.1.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("Pustalorc.PlayerInfoLib.Unturned.PlayerData", b =>
+            modelBuilder.Entity("Pustalorc.PlayerInfoLib.Unturned.Database.PlayerData", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -36,9 +35,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Ip")
-                        .HasColumnName("Ip")
-                        .HasColumnType("INT UNSIGNED");
+                    b.Property<long>("Ip")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("LastLoginGlobal")
                         .HasColumnType("datetime");
@@ -46,6 +44,11 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
                     b.Property<long>("LastQuestGroupId")
                         .HasColumnName("LastQuestGroupId")
                         .HasColumnType("BIGINT UNSIGNED");
+
+                    b.Property<string>("ProfilePictureHash")
+                        .IsRequired()
+                        .HasColumnType("varchar(64)")
+                        .HasMaxLength(64);
 
                     b.Property<int>("ServerId")
                         .HasColumnType("int");
@@ -74,7 +77,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
                     b.ToTable("Pustalorc_PlayerInfoLib_Unturned_Players");
                 });
 
-            modelBuilder.Entity("Pustalorc.PlayerInfoLib.Unturned.Server", b =>
+            modelBuilder.Entity("Pustalorc.PlayerInfoLib.Unturned.Database.Server", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -95,9 +98,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
                     b.ToTable("Pustalorc_PlayerInfoLib_Unturned_Servers");
                 });
 
-            modelBuilder.Entity("Pustalorc.PlayerInfoLib.Unturned.PlayerData", b =>
+            modelBuilder.Entity("Pustalorc.PlayerInfoLib.Unturned.Database.PlayerData", b =>
                 {
-                    b.HasOne("Pustalorc.PlayerInfoLib.Unturned.Server", "Server")
+                    b.HasOne("Pustalorc.PlayerInfoLib.Unturned.Database.Server", "Server")
                         .WithMany()
                         .HasForeignKey("ServerId")
                         .OnDelete(DeleteBehavior.Cascade)

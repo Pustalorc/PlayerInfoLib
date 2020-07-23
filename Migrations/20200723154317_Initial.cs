@@ -9,28 +9,32 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                "Pustalorc_PlayerInfoLib_Unturned_Servers",
-                table => new
+                name: "Pustalorc_PlayerInfoLib_Unturned_Servers",
+                columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     Instance = table.Column<string>(maxLength: 128, nullable: false),
                     Name = table.Column<string>(maxLength: 50, nullable: false)
                 },
-                constraints: table => { table.PrimaryKey("PK_Pustalorc_PlayerInfoLib_Unturned_Servers", x => x.Id); });
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Pustalorc_PlayerInfoLib_Unturned_Servers", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
-                "Pustalorc_PlayerInfoLib_Unturned_Players",
-                table => new
+                name: "Pustalorc_PlayerInfoLib_Unturned_Players",
+                columns: table => new
                 {
-                    Id = table.Column<long>("BIGINT UNSIGNED", nullable: false),
+                    Id = table.Column<long>(type: "BIGINT UNSIGNED", nullable: false),
                     SteamName = table.Column<string>(maxLength: 64, nullable: false),
                     CharacterName = table.Column<string>(maxLength: 64, nullable: false),
-                    LastQuestGroupId = table.Column<long>("BIGINT UNSIGNED", nullable: false),
-                    SteamGroup = table.Column<long>("BIGINT UNSIGNED", nullable: false),
+                    ProfilePictureHash = table.Column<string>(maxLength: 64, nullable: false),
+                    LastQuestGroupId = table.Column<long>(type: "BIGINT UNSIGNED", nullable: false),
+                    SteamGroup = table.Column<long>(type: "BIGINT UNSIGNED", nullable: false),
                     SteamGroupName = table.Column<string>(maxLength: 64, nullable: false),
                     Hwid = table.Column<string>(nullable: false),
-                    Ip = table.Column<int>("INT UNSIGNED", nullable: false),
+                    Ip = table.Column<long>(nullable: false),
                     TotalPlaytime = table.Column<double>(nullable: false),
                     LastLoginGlobal = table.Column<DateTime>(nullable: false),
                     ServerId = table.Column<int>(nullable: false)
@@ -39,26 +43,26 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
                 {
                     table.PrimaryKey("PK_Pustalorc_PlayerInfoLib_Unturned_Players", x => x.Id);
                     table.ForeignKey(
-                        "FK_Pustalorc_PlayerInfoLib_Unturned_Players_Pustalorc_PlayerInf~",
-                        x => x.ServerId,
-                        "Pustalorc_PlayerInfoLib_Unturned_Servers",
-                        "Id",
+                        name: "FK_Pustalorc_PlayerInfoLib_Unturned_Players_Pustalorc_PlayerInf~",
+                        column: x => x.ServerId,
+                        principalTable: "Pustalorc_PlayerInfoLib_Unturned_Servers",
+                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                "IX_Pustalorc_PlayerInfoLib_Unturned_Players_ServerId",
-                "Pustalorc_PlayerInfoLib_Unturned_Players",
-                "ServerId");
+                name: "IX_Pustalorc_PlayerInfoLib_Unturned_Players_ServerId",
+                table: "Pustalorc_PlayerInfoLib_Unturned_Players",
+                column: "ServerId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                "Pustalorc_PlayerInfoLib_Unturned_Players");
+                name: "Pustalorc_PlayerInfoLib_Unturned_Players");
 
             migrationBuilder.DropTable(
-                "Pustalorc_PlayerInfoLib_Unturned_Servers");
+                name: "Pustalorc_PlayerInfoLib_Unturned_Servers");
         }
     }
 }
