@@ -12,9 +12,9 @@
     <LangVersion>8</LangVersion>
     <Description>A library to store more information about unturned players.</Description>
     <PackageReleaseNotes>First release</PackageReleaseNotes>
-    <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib/tree/OpenMod</RepositoryUrl>
+    <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
-    <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib/tree/OpenMod</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib</PackageProjectUrl>
     <Copyright>Copyright © 2020 Pustalorc</Copyright>
     <Version>3.0.0</Version>
   </PropertyGroup>
