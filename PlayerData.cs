@@ -1,64 +1,36 @@
 ﻿using System;
-using Steamworks;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PlayerInfoLibrary
+namespace Pustalorc.PlayerInfoLib.Unturned
 {
-    public sealed class PlayerData
+    public class PlayerData
     {
-        // IDENTIFYABLE PERSONAL DATA
-        public CSteamID SteamId { get; private set; }
-        public ulong LastQuestGroupId { get; internal set; }
-        public string GroupName { get; internal set; }
-        public string SteamName { get; internal set; }
-        public string CharacterName { get; internal set; }
-        public string Hwid { get; internal set; }
-        public uint Ip { get; internal set; }
+        [Column("Id", TypeName = "BIGINT UNSIGNED")] [Key] [Required] public ulong Id { get; set; }
 
-        // SERVER RELATED DATA
-        public ulong TotalPlaytime { get; internal set; }
-        public ushort ServerId { get; private set; }
-        public string ServerName { get; internal set; }
-        public DateTime LastLoginGlobal { get; internal set; }
+        [Required] [StringLength(64)] public string SteamName { get; set; }
 
-        /// <summary>
-        /// Checks to see if the data is valid.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsValid()
-        {
-            return SteamId != CSteamID.Nil;
-        }
+        [Required] [StringLength(64)] public string CharacterName { get; set; }
 
-        internal PlayerData(CSteamID steamId, string steamName, string characterName, ulong groupId, string groupName,
-            uint ip, string hwid, string serverName, ushort serverId, ulong totalPlaytime, DateTime lastLoginGlobal)
-        {
-            SteamId = steamId;
-            SteamName = steamName;
-            CharacterName = characterName;
-            LastQuestGroupId = groupId;
-            GroupName = groupName;
-            Ip = ip;
-            Hwid = hwid;
-            LastLoginGlobal = lastLoginGlobal;
-            ServerName = serverName;
-            ServerId = serverId;
-            TotalPlaytime = totalPlaytime;
-        }
+        [Column("LastQuestGroupId", TypeName = "BIGINT UNSIGNED")] [Required] [DefaultValue(0)] public ulong LastQuestGroupId { get; set; }
 
-        internal PlayerData(CSteamID steamId, string steamName, string characterName, ulong groupId, uint ip,
-            string hwid, string serverName, ushort serverId, ulong totalPlaytime, DateTime lastLoginGlobal)
-        {
-            SteamId = steamId;
-            SteamName = steamName;
-            CharacterName = characterName;
-            LastQuestGroupId = groupId;
-            GroupName = "";
-            Ip = ip;
-            Hwid = hwid;
-            LastLoginGlobal = lastLoginGlobal;
-            ServerName = serverName;
-            ServerId = serverId;
-            TotalPlaytime = totalPlaytime;
-        }
+        [Column("SteamGroup", TypeName = "BIGINT UNSIGNED")] [Required] [DefaultValue(0)] public ulong SteamGroup { get; set; }
+
+        [Required]
+        [StringLength(64)]
+        [DefaultValue("N/A")]
+        public string SteamGroupName { get; set; }
+
+        [Required] public string Hwid { get; set; }
+
+        [Required] public long Ip { get; set; }
+
+        [Required] [DefaultValue(0)] public double TotalPlaytime { get; set; }
+
+        [Required] public DateTime LastLoginGlobal { get; set; }
+
+        [Required] public int ServerId { get; set; }
+        public virtual Server Server { get; set; }
     }
 }
