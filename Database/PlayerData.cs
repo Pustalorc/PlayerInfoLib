@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -15,6 +16,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
         [Required] [StringLength(64)] public string SteamName { get; set; }
 
         [Required] [StringLength(64)] public string CharacterName { get; set; }
+
+        [Required] [StringLength(64)] public string ProfilePictureHash { get; set; }
 
         [Column("LastQuestGroupId", TypeName = "BIGINT UNSIGNED")]
         [Required]

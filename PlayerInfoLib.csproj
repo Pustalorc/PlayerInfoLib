@@ -16,18 +16,8 @@
     <RepositoryType>Github</RepositoryType>
     <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib/tree/OpenMod</PackageProjectUrl>
     <Copyright>Copyright © 2020 Pustalorc</Copyright>
+    <Version>3.0.0</Version>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Migrations\20200722125651_Initial.cs" />
-    <Compile Remove="Migrations\20200722125651_Initial.Designer.cs" />
-    <Compile Remove="Migrations\20200723104849_MoreAttributes.cs" />
-    <Compile Remove="Migrations\20200723104849_MoreAttributes.Designer.cs" />
-    <Compile Remove="Migrations\20200723105031_Initial.cs" />
-    <Compile Remove="Migrations\20200723105031_Initial.Designer.cs" />
-    <Compile Remove="Migrations\20200723105931_FixServerId.cs" />
-    <Compile Remove="Migrations\20200723105931_FixServerId.Designer.cs" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.6">
@@ -50,9 +40,5 @@
   <ItemGroup>
     <EmbeddedResource Include="config.yaml" />
     <EmbeddedResource Include="translations.yaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Commands\" />
   </ItemGroup>
 </Project>

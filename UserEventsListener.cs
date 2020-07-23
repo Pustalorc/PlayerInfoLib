@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using OpenMod.API.Eventing;
 using OpenMod.Core.Users.Events;
 using OpenMod.Unturned.Users;
 using Pustalorc.PlayerInfoLib.Unturned.Database;
+using Pustalorc.PlayerInfoLib.Unturned.SteamWebApiClasses;
 using SDG.Unturned;
 using Steamworks;
 
@@ -15,10 +20,12 @@ namespace Pustalorc.PlayerInfoLib.Unturned
     public class UserEventsListener : IEventListener<UserConnectedEvent>, IEventListener<UserDisconnectedEvent>
     {
         private readonly PlayerInfoLibDbContext m_DbContext;
+        private readonly IConfiguration m_Configuration;
 
-        public UserEventsListener(PlayerInfoLibDbContext dbContext)
+        public UserEventsListener(PlayerInfoLibDbContext dbContext, IConfiguration configuration)
         {
             m_DbContext = dbContext;
+            m_Configuration = configuration;
         }
 
         public async Task HandleEventAsync(object sender, UserConnectedEvent @event)
@@ -38,12 +45,13 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 {
                     Id = player.SteamId.m_SteamID,
                     CharacterName = player.DisplayName,
+                    ProfilePictureHash = await GetProfilePictureHash(player.SteamId),
                     Hwid = string.Join("", playerId.hwid),
                     Ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP,
                     LastLoginGlobal = DateTime.Now,
                     LastQuestGroupId = player.Player.quests.groupID.m_SteamID,
                     SteamGroup = playerId.group.m_SteamID,
-                    SteamGroupName = await GetGroupName(playerId.group),
+                    SteamGroupName = await GetSteamGroupName(playerId.group),
                     SteamName = playerId.playerName,
                     TotalPlaytime = 0,
                     ServerId = server.Id
@@ -53,13 +61,14 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             }
             else
             {
+                pData.ProfilePictureHash = await GetProfilePictureHash(player.SteamId);
                 pData.CharacterName = player.DisplayName;
                 pData.Hwid = string.Join("", playerId.hwid);
                 pData.Ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
                 pData.LastLoginGlobal = DateTime.Now;
                 pData.LastQuestGroupId = player.Player.quests.groupID.m_SteamID;
                 pData.SteamGroup = playerId.group.m_SteamID;
-                pData.SteamGroupName = await GetGroupName(playerId.group);
+                pData.SteamGroupName = await GetSteamGroupName(playerId.group);
                 pData.SteamName = playerId.playerName;
                 pData.ServerId = server.Id;
             }
@@ -84,13 +93,14 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 {
                     Id = player.SteamId.m_SteamID,
                     CharacterName = player.DisplayName,
+                    SteamName = playerId.playerName,
+                    ProfilePictureHash = await GetProfilePictureHash(player.SteamId),
                     Hwid = string.Join("", playerId.hwid),
                     Ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP,
                     LastLoginGlobal = DateTime.Now,
                     LastQuestGroupId = player.Player.quests.groupID.m_SteamID,
                     SteamGroup = playerId.group.m_SteamID,
-                    SteamGroupName = await GetGroupName(playerId.group),
-                    SteamName = playerId.playerName,
+                    SteamGroupName = await GetSteamGroupName(playerId.group),
                     TotalPlaytime = 0,
                     ServerId = server.Id
                 };
@@ -99,9 +109,10 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             }
             else
             {
+                pData.ProfilePictureHash = await GetProfilePictureHash(player.SteamId);
                 pData.LastQuestGroupId = player.Player.quests.groupID.m_SteamID;
                 pData.SteamGroup = playerId.group.m_SteamID;
-                pData.SteamGroupName = await GetGroupName(playerId.group);
+                pData.SteamGroupName = await GetSteamGroupName(playerId.group);
                 pData.TotalPlaytime += DateTime.Now.Subtract(pData.LastLoginGlobal).TotalSeconds;
                 pData.ServerId = server.Id;
             }
@@ -109,8 +120,23 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             await m_DbContext.SaveChangesAsync();
         }
 
+        private async Task<string> GetProfilePictureHash(CSteamID user)
+        {
+            var apiKey = m_Configuration["steamWebApiKey"];
+            if (string.IsNullOrEmpty(apiKey))
+                return "";
+
+            using var web = new WebClient();
+            var result =
+                await web.DownloadStringTaskAsync($"http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={apiKey}&steamids={user.m_SteamID}");
+
+            var deserialized = JsonConvert.DeserializeObject<PlayerSummaries>(result);
+
+            return deserialized.response.players.FirstOrDefault(k => k.steamid.Equals(user.ToString(), StringComparison.Ordinal))?.avatarhash ?? "";
+        }
+
         [ItemNotNull]
-        private static async Task<string> GetGroupName(CSteamID groupId)
+        private static async Task<string> GetSteamGroupName(CSteamID groupId)
         {
             using var web = new WebClient();
             var result =
@@ -123,7 +149,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             var end = result.IndexOf("</groupName>", start, StringComparison.Ordinal);
 
             var data = result.Substring(start, end - start);
-            data = data.Replace(" ", "");
+            data = data.Trim();
             data = data.Replace("<![CDATA[", "").Replace("]]>", "");
             return data;
         }
