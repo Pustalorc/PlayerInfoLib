@@ -1,17 +1,15 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenMod.API.Plugins;
 using OpenMod.EntityFrameworkCore.Extensions;
 using OpenMod.Unturned.Plugins;
 using Pustalorc.PlayerInfoLib.Unturned.Database;
-using SDG.Unturned;
 
 [assembly:
     PluginMetadata("Pustalorc.PlayerInfoLib.Unturned", Author = "Pustalorc",
         DisplayName = "Player Info Library Unturned",
-        Website = "https://github.com/Pustalorc/PlayerInfoLib/tree/OpenMod")]
+        Website = "https://github.com/Pustalorc/PlayerInfoLib/")]
 
 namespace Pustalorc.PlayerInfoLib.Unturned
 {
@@ -30,18 +28,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
         protected override async UniTask OnLoadAsync()
         {
             await m_DbContext.OpenModMigrateAsync();
-
-            var server = await m_DbContext.Servers.FirstOrDefaultAsync(d =>
-                d.Instance.Equals(Provider.serverID, StringComparison.Ordinal));
-            if (server == null)
-                await m_DbContext.Servers.AddAsync(new Server
-                {
-                    Instance = Provider.serverID,
-                    Name = Provider.serverName
-                });
-            else
-                server.Name = Provider.serverName;
-            await m_DbContext.SaveChangesAsync();
+            await m_DbContext.CheckServerExistsAsync();
 
             m_Logger.LogInformation("Player Info Library for Unturned by Pustalorc was loaded correctly.");
         }
