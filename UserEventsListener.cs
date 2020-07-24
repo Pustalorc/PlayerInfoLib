@@ -3,15 +3,14 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OpenMod.API.Eventing;
+using OpenMod.API.Users;
 using OpenMod.Core.Users.Events;
 using OpenMod.Unturned.Users;
 using Pustalorc.PlayerInfoLib.Unturned.Database;
 using Pustalorc.PlayerInfoLib.Unturned.SteamWebApiClasses;
-using SDG.Unturned;
 using Steamworks;
 
 namespace Pustalorc.PlayerInfoLib.Unturned
@@ -34,10 +33,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             var playerId = player.SteamPlayer.playerID;
             SteamGameServerNetworking.GetP2PSessionState(player.SteamId, out var sessionState);
 
-            var pData = await m_DbContext.Players.FirstOrDefaultAsync(d => d.Id.Equals(player.SteamId.m_SteamID));
-            var server =
-                await m_DbContext.Servers.FirstAsync(
-                    k => k.Instance.Equals(Provider.serverID, StringComparison.Ordinal));
+            var pData = m_DbContext.FindPlayer(player.SteamId.ToString(), UserSearchMode.Id);
+            var server = await m_DbContext.GetCurrentServerAsync();
             if (pData == null)
             {
                 pData = new PlayerData
@@ -82,10 +79,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             var playerId = player.SteamPlayer.playerID;
             SteamGameServerNetworking.GetP2PSessionState(player.SteamId, out var sessionState);
 
-            var pData = await m_DbContext.Players.FirstOrDefaultAsync(d => d.Id.Equals(player.SteamId.m_SteamID));
-            var server =
-                await m_DbContext.Servers.FirstAsync(
-                    k => k.Instance.Equals(Provider.serverID, StringComparison.Ordinal));
+            var pData = await m_DbContext.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.Id);
+            var server = await m_DbContext.GetCurrentServerAsync();
             if (pData == null)
             {
                 pData = new PlayerData

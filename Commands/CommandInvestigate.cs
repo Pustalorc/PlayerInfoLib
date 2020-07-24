@@ -1,9 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Localization;
+﻿using Microsoft.Extensions.Localization;
+using OpenMod.API.Users;
 using OpenMod.Core.Commands;
 using Pustalorc.PlayerInfoLib.Unturned.Database;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,26 +28,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
             var actor = Context.Actor;
             var targetPlayer = await Context.Parameters.GetAsync<string>(0);
 
-            var players = new List<PlayerData>();
+            var players = m_DbContext.FindMultiplePlayers(targetPlayer, UserSearchMode.NameOrId);
 
-            if (ulong.TryParse(targetPlayer, out var id) && id >= 76561197960265728 && id <= 103582791429521408)
-            {
-                var data = await m_DbContext.Players.FirstOrDefaultAsync(k => k.Id == id);
-
-                if (data != null)
-                    players.Add(data);
-            }
-            else
-            {
-                var data = m_DbContext.Players.Where(k =>
-                    k.CharacterName.ToLower().Contains(targetPlayer.ToLower()) ||
-                    k.SteamName.ToLower().Contains(targetPlayer.ToLower()));
-
-                if (data.Any())
-                    players.AddRange(data);
-            }
-
-            if (players.Count == 0)
+            if (!players.Any())
             {
                 await actor.PrintMessageAsync(m_StringLocalizer["investigate:no_results", new {Target = targetPlayer}]);
             }
@@ -56,13 +38,13 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
             {
                 await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_count", new {players.Count}]);
                 var firstResult = players.First();
-                var server = await m_DbContext.Servers.FirstOrDefaultAsync(k => k.Id == firstResult.ServerId);
+                var server = await m_DbContext.GetServerAsync(firstResult.ServerId);
                 var timeSpan = TimeSpan.FromSeconds(firstResult.TotalPlaytime);
 
                 await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_text",
                     new
                     {
-                        Data = firstResult, ServerName = server.Name ?? "",
+                        Data = firstResult, ServerName = server?.Name ?? "",
                         TotalPlaytimeFormatted = m_StringLocalizer["timestamp_format", new {Span = timeSpan}]
                     }]);
             }

@@ -1,4 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
+// ReSharper disable IdentifierTypo
 // Auto-Generated with Visual Studio special pasting (JSON as Classes)
 
 namespace Pustalorc.PlayerInfoLib.Unturned.SteamWebApiClasses
