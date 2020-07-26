@@ -17,18 +17,21 @@ namespace Pustalorc.PlayerInfoLib.Unturned
     {
         private readonly ILogger<PlayerInfoLibrary> m_Logger;
         private readonly PlayerInfoLibDbContext m_DbContext;
+        private readonly IPlayerInfoRepository m_PlayerInfoRepository;
 
         public PlayerInfoLibrary(ILogger<PlayerInfoLibrary> logger, IServiceProvider serviceProvider,
-            PlayerInfoLibDbContext dbContext) : base(serviceProvider)
+            PlayerInfoLibDbContext dbContext, IPlayerInfoRepository playerInfoRepository) : base(serviceProvider)
         {
             m_Logger = logger;
             m_DbContext = dbContext;
+            m_PlayerInfoRepository = playerInfoRepository;
         }
 
         protected override async UniTask OnLoadAsync()
         {
             await m_DbContext.OpenModMigrateAsync();
-            await m_DbContext.CheckServerExistsAsync();
+
+            await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
 
             m_Logger.LogInformation("Player Info Library for Unturned by Pustalorc was loaded correctly.");
         }

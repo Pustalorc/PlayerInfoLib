@@ -11,9 +11,9 @@
     <AssemblyName>Pustalorc.PlayerInfoLib.Unturned</AssemblyName>
     <LangVersion>8</LangVersion>
     <Description>A library to store more information about unturned players.</Description>
-    <PackageReleaseNotes>Added methods to search for and get players as well as servers.
-Fix bad URL of website &amp; simplified server check.
-Switch to new methods for searching players.</PackageReleaseNotes>
+    <PackageReleaseNotes>Moved Database Classes to API\Classes
+Created a Repository and respective service to manage access to the DB
+Fix minor implementation issues with FindMultiplePlayers not including results by name when searching with UserSearchMode.IdOrName</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib</PackageProjectUrl>

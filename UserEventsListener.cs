@@ -17,12 +17,12 @@ namespace Pustalorc.PlayerInfoLib.Unturned
 {
     public class UserEventsListener : IEventListener<UserConnectedEvent>, IEventListener<UserDisconnectedEvent>
     {
-        private readonly PlayerInfoLibDbContext m_DbContext;
+        private readonly IPlayerInfoRepository m_PlayerInfoRepository;
         private readonly IConfiguration m_Configuration;
 
-        public UserEventsListener(PlayerInfoLibDbContext dbContext, IConfiguration configuration)
+        public UserEventsListener(IPlayerInfoRepository playerInfoRepository, IConfiguration configuration)
         {
-            m_DbContext = dbContext;
+            m_PlayerInfoRepository = playerInfoRepository;
             m_Configuration = configuration;
         }
 
@@ -31,45 +31,41 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             if (!(@event.User is UnturnedUser player)) return;
 
             var playerId = player.SteamPlayer.playerID;
-            SteamGameServerNetworking.GetP2PSessionState(player.SteamId, out var sessionState);
+            var steamId = player.SteamId;
+            var pfpHash = await GetProfilePictureHashAsync(steamId);
+            var groupName = await GetSteamGroupNameAsync(playerId.group);
+            var hwid = string.Join("", playerId.hwid);
+            SteamGameServerNetworking.GetP2PSessionState(steamId, out var sessionState);
+            var ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
 
-            var pData = m_DbContext.FindPlayer(player.SteamId.ToString(), UserSearchMode.Id);
-            var server = await m_DbContext.GetCurrentServerAsync();
+            var pData = await m_PlayerInfoRepository.FindPlayerAsync(steamId.ToString(), UserSearchMode.Id);
+            var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ?? await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
+
             if (pData == null)
             {
-                pData = new PlayerData
-                {
-                    Id = player.SteamId.m_SteamID,
-                    CharacterName = player.DisplayName,
-                    ProfilePictureHash = await GetProfilePictureHash(player.SteamId),
-                    Hwid = string.Join("", playerId.hwid),
-                    Ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP,
-                    LastLoginGlobal = DateTime.Now,
-                    LastQuestGroupId = player.Player.quests.groupID.m_SteamID,
-                    SteamGroup = playerId.group.m_SteamID,
-                    SteamGroupName = await GetSteamGroupName(playerId.group),
-                    SteamName = playerId.playerName,
-                    TotalPlaytime = 0,
-                    ServerId = server.Id
-                };
+                pData = m_PlayerInfoRepository.BuildPlayerData(steamId.m_SteamID, player.DisplayName,
+                    playerId.playerName, hwid, ip,
+                    pfpHash, player.Player.quests.groupID.m_SteamID, playerId.group.m_SteamID, groupName, 0,
+                    DateTime.Now, server);
 
-                await m_DbContext.Players.AddAsync(pData);
+                await m_PlayerInfoRepository.AddPlayerDataAsync(pData);
             }
             else
             {
-                pData.ProfilePictureHash = await GetProfilePictureHash(player.SteamId);
+                pData.ProfilePictureHash = pfpHash;
                 pData.CharacterName = player.DisplayName;
-                pData.Hwid = string.Join("", playerId.hwid);
-                pData.Ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
+                pData.Hwid = hwid;
+                pData.Ip = ip;
                 pData.LastLoginGlobal = DateTime.Now;
                 pData.LastQuestGroupId = player.Player.quests.groupID.m_SteamID;
                 pData.SteamGroup = playerId.group.m_SteamID;
-                pData.SteamGroupName = await GetSteamGroupName(playerId.group);
+                pData.SteamGroupName = groupName;
                 pData.SteamName = playerId.playerName;
+                pData.Server = server;
                 pData.ServerId = server.Id;
-            }
 
-            await m_DbContext.SaveChangesAsync();
+                await m_PlayerInfoRepository.SaveChangesAsync();
+            }
         }
 
         public async Task HandleEventAsync(object sender, UserDisconnectedEvent @event)
@@ -77,45 +73,46 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             if (!(@event.User is UnturnedUser player)) return;
 
             var playerId = player.SteamPlayer.playerID;
-            SteamGameServerNetworking.GetP2PSessionState(player.SteamId, out var sessionState);
+            var steamId = player.SteamId;
+            var pfpHash = await GetProfilePictureHashAsync(steamId);
+            var groupName = await GetSteamGroupNameAsync(playerId.group);
+            var hwid = string.Join("", playerId.hwid);
+            SteamGameServerNetworking.GetP2PSessionState(steamId, out var sessionState);
+            var ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
 
-            var pData = await m_DbContext.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.Id);
-            var server = await m_DbContext.GetCurrentServerAsync();
+            var pData = await m_PlayerInfoRepository.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.Id);
+            var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ?? await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
+
             if (pData == null)
             {
-                pData = new PlayerData
-                {
-                    Id = player.SteamId.m_SteamID,
-                    CharacterName = player.DisplayName,
-                    SteamName = playerId.playerName,
-                    ProfilePictureHash = await GetProfilePictureHash(player.SteamId),
-                    Hwid = string.Join("", playerId.hwid),
-                    Ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP,
-                    LastLoginGlobal = DateTime.Now,
-                    LastQuestGroupId = player.Player.quests.groupID.m_SteamID,
-                    SteamGroup = playerId.group.m_SteamID,
-                    SteamGroupName = await GetSteamGroupName(playerId.group),
-                    TotalPlaytime = 0,
-                    ServerId = server.Id
-                };
+                pData = m_PlayerInfoRepository.BuildPlayerData(steamId.m_SteamID, player.DisplayName,
+                    playerId.playerName, hwid, ip,
+                    pfpHash, player.Player.quests.groupID.m_SteamID, playerId.group.m_SteamID, groupName, 0,
+                    DateTime.Now, server);
 
-                await m_DbContext.Players.AddAsync(pData);
+                await m_PlayerInfoRepository.AddPlayerDataAsync(pData);
             }
             else
             {
-                pData.ProfilePictureHash = await GetProfilePictureHash(player.SteamId);
+                pData.ProfilePictureHash = pfpHash;
+                pData.CharacterName = player.DisplayName;
+                pData.Hwid = hwid;
+                pData.Ip = ip;
+                pData.LastLoginGlobal = DateTime.Now;
                 pData.LastQuestGroupId = player.Player.quests.groupID.m_SteamID;
                 pData.SteamGroup = playerId.group.m_SteamID;
-                pData.SteamGroupName = await GetSteamGroupName(playerId.group);
+                pData.SteamGroupName = groupName;
+                pData.SteamName = playerId.playerName;
                 pData.TotalPlaytime += DateTime.Now.Subtract(pData.LastLoginGlobal).TotalSeconds;
+                pData.Server = server;
                 pData.ServerId = server.Id;
             }
 
-            await m_DbContext.SaveChangesAsync();
+            await m_PlayerInfoRepository.SaveChangesAsync();
         }
 
         [ItemNotNull]
-        private async Task<string> GetProfilePictureHash(CSteamID user)
+        private async Task<string> GetProfilePictureHashAsync(CSteamID user)
         {
             var apiKey = m_Configuration["steamWebApiKey"];
             if (string.IsNullOrEmpty(apiKey))
@@ -134,7 +131,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
         }
 
         [ItemNotNull]
-        private static async Task<string> GetSteamGroupName(CSteamID groupId)
+        private static async Task<string> GetSteamGroupNameAsync(CSteamID groupId)
         {
             using var web = new WebClient();
             var result =

@@ -13,14 +13,14 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
     [CommandDescription("Renames the current instance in the DB ")]
     public class CommandInvestigate : Command
     {
+        private readonly IPlayerInfoRepository m_PlayerInfoRepository;
         private readonly IStringLocalizer m_StringLocalizer;
-        private readonly PlayerInfoLibDbContext m_DbContext;
 
         public CommandInvestigate(IServiceProvider serviceProvider, IStringLocalizer stringLocalizer,
-            PlayerInfoLibDbContext dbContext) : base(serviceProvider)
+            IPlayerInfoRepository playerInfoRepository) : base(serviceProvider)
         {
-            m_DbContext = dbContext;
             m_StringLocalizer = stringLocalizer;
+            m_PlayerInfoRepository = playerInfoRepository;
         }
 
         protected override async Task OnExecuteAsync()
@@ -28,7 +28,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
             var actor = Context.Actor;
             var targetPlayer = await Context.Parameters.GetAsync<string>(0);
 
-            var players = m_DbContext.FindMultiplePlayers(targetPlayer, UserSearchMode.NameOrId);
+            var players = m_PlayerInfoRepository.FindMultiplePlayers(targetPlayer, UserSearchMode.NameOrId);
 
             if (!players.Any())
             {
@@ -38,7 +38,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
             {
                 await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_count", new {players.Count}]);
                 var firstResult = players.First();
-                var server = await m_DbContext.GetServerAsync(firstResult.ServerId);
+                var server = firstResult.Server ?? await m_PlayerInfoRepository.GetServerAsync(firstResult.ServerId);
                 var timeSpan = TimeSpan.FromSeconds(firstResult.TotalPlaytime);
 
                 await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_text",
