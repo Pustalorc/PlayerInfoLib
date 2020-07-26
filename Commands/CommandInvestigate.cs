@@ -10,7 +10,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
 {
     [Command("investigate")]
     [CommandSyntax("<player>")]
-    [CommandDescription("Renames the current instance in the DB ")]
+    [CommandDescription("Investigates and gets information about a player.")]
     public class CommandInvestigate : Command
     {
         private readonly IPlayerInfoRepository m_PlayerInfoRepository;
