@@ -127,10 +127,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
             {
                 UserSearchMode.Id => GetPlayerByIdInternal(searchTerm),
                 UserSearchMode.Name => GetPlayerByNameInternal(searchTerm),
-                UserSearchMode.NameOrId => GetPlayerByIdInternal(searchTerm)
-                    .Concat(GetPlayerByNameInternal(searchTerm)),
-                _ => Array.Empty<PlayerData>().AsQueryable()
-            };
+                UserSearchMode.NameOrId => GetPlayerByIdInternal(searchTerm).Concat(GetPlayerByNameInternal(searchTerm)),
+                _ => m_DbContext.Players.Take(0)
+        };
         }
 
         #endregion
@@ -153,7 +152,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
         private IQueryable<PlayerData> GetPlayerByIdInternal(string searchTerm)
         {
             if (!ulong.TryParse(searchTerm, out var id) || id < 76561197960265728 || id > 103582791429521408)
-                return Array.Empty<PlayerData>().AsQueryable();
+                return m_DbContext.Players.Take(0);
 
             return m_DbContext.Players.Where(k => k.Id == id);
         }

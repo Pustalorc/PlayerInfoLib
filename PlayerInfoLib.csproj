@@ -26,8 +26,8 @@ Fix minor implementation issues with FindMultiplePlayers not including results b
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenMod.EntityFrameworkCore" Version="1.1.6" />
-    <PackageReference Include="OpenMod.Unturned" Version="1.1.6" />
+    <PackageReference Include="OpenMod.EntityFrameworkCore" Version="1.1.7" />
+    <PackageReference Include="OpenMod.Unturned" Version="1.1.7" />
 	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.20.5.6" />
 	<PackageReference Include="OpenMod.UnityEngine.Redist" Version="2018.4.23" />
     <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
