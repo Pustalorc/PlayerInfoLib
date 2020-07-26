@@ -106,9 +106,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 pData.TotalPlaytime += DateTime.Now.Subtract(pData.LastLoginGlobal).TotalSeconds;
                 pData.Server = server;
                 pData.ServerId = server.Id;
-            }
 
-            await m_PlayerInfoRepository.SaveChangesAsync();
+                await m_PlayerInfoRepository.SaveChangesAsync();
+            }
         }
 
         [ItemNotNull]
