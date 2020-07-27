@@ -159,7 +159,11 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
 
         private IQueryable<PlayerData> GetPlayerByNameInternal(string searchTerm)
         {
-            var searchLowered = searchTerm.ToLower();
+            var trimmed = searchTerm.Trim();
+            if (string.IsNullOrEmpty(trimmed))
+                return m_DbContext.Players.Take(0);
+
+            var searchLowered = trimmed.ToLower();
             return m_DbContext.Players.Where(k =>
                 k.CharacterName.ToLower().Contains(searchLowered) || k.SteamName.ToLower().Contains(searchLowered));
         }
