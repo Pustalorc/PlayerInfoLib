@@ -104,7 +104,6 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 pData.CharacterName = player.DisplayName;
                 pData.Hwid = hwid;
                 pData.Ip = ip;
-                pData.LastLoginGlobal = DateTime.Now;
                 pData.LastQuestGroupId = player.Player.quests.groupID.m_SteamID;
                 pData.SteamGroup = playerId.group.m_SteamID;
                 pData.SteamGroupName = groupName;
