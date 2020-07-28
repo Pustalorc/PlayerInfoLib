@@ -1,7 +1,12 @@
-﻿using System;
+﻿// ReSharper disable AnnotateCanBeNullTypeMember
+// ReSharper disable AnnotateNotNullTypeMember
+// ReSharper disable AnnotateNotNullParameter
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenMod.API.Ioc;
@@ -118,6 +123,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
             return await FindMultiplePlayersInternal(searchTerm, searchMode).ToListAsync();
         }
 
+        [ItemNotNull]
         public List<PlayerData> FindMultiplePlayers(string searchTerm, UserSearchMode searchMode)
         {
             return FindMultiplePlayersInternal(searchTerm, searchMode).ToList();
@@ -129,9 +135,10 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
             {
                 UserSearchMode.Id => GetPlayerByIdInternal(searchTerm),
                 UserSearchMode.Name => GetPlayerByNameInternal(searchTerm),
-                UserSearchMode.NameOrId => GetPlayerByIdInternal(searchTerm).Concat(GetPlayerByNameInternal(searchTerm)),
+                UserSearchMode.NameOrId => GetPlayerByIdInternal(searchTerm)
+                    .Concat(GetPlayerByNameInternal(searchTerm)),
                 _ => m_DbContext.Players.Take(0)
-        };
+            };
         }
 
         #endregion

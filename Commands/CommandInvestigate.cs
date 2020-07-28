@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Localization;
 using OpenMod.API.Users;
 using OpenMod.Core.Commands;
-using Pustalorc.PlayerInfoLib.Unturned.Database;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

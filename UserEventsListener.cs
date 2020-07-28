@@ -1,4 +1,7 @@
-﻿using System;
+﻿// ReSharper disable AnnotateNotNullParameter
+// ReSharper disable AnnotateNotNullTypeMember
+
+using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,7 +15,6 @@ using OpenMod.Unturned.Users;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes.SteamWebApiClasses;
 using Pustalorc.PlayerInfoLib.Unturned.API.Services;
-using Pustalorc.PlayerInfoLib.Unturned.Database;
 using Steamworks;
 
 namespace Pustalorc.PlayerInfoLib.Unturned
@@ -41,7 +43,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             var ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
 
             var pData = await m_PlayerInfoRepository.FindPlayerAsync(steamId.ToString(), UserSearchMode.Id);
-            var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ?? await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
+            var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ??
+                         await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
 
             if (pData == null)
             {
@@ -83,7 +86,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             var ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
 
             var pData = await m_PlayerInfoRepository.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.Id);
-            var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ?? await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
+            var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ??
+                         await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
 
             if (pData == null)
             {
@@ -113,7 +117,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             }
         }
 
-        private PlayerData BuildPlayerData(ulong steamId, string characterName, string steamName, string hwid, uint ip,string profileHash, ulong questGroup, ulong steamGroup, string steamGroupName, double totalPlaytime,DateTime lastLogin, Server server)
+        private static PlayerData BuildPlayerData(ulong steamId, string characterName, string steamName, string hwid, uint ip,
+            string profileHash, ulong questGroup, ulong steamGroup, string steamGroupName, double totalPlaytime,
+            DateTime lastLogin, Server server)
         {
             return new PlayerData
             {
