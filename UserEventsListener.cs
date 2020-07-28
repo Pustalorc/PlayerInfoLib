@@ -41,6 +41,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             var hwid = string.Join("", playerId.hwid);
             SteamGameServerNetworking.GetP2PSessionState(steamId, out var sessionState);
             var ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
+            var questGroupId = player.Player.quests.groupID.m_SteamID;
 
             var pData = await m_PlayerInfoRepository.FindPlayerAsync(steamId.ToString(), UserSearchMode.Id);
             var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ??
@@ -50,7 +51,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             {
                 pData = BuildPlayerData(steamId.m_SteamID, player.DisplayName,
                     playerId.playerName, hwid, ip,
-                    pfpHash, player.Player.quests.groupID.m_SteamID, playerId.group.m_SteamID, groupName, 0,
+                    pfpHash, questGroupId, playerId.group.m_SteamID, groupName, 0,
                     DateTime.Now, server);
 
                 await m_PlayerInfoRepository.AddPlayerDataAsync(pData);
@@ -62,7 +63,10 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 pData.Hwid = hwid;
                 pData.Ip = ip;
                 pData.LastLoginGlobal = DateTime.Now;
-                pData.LastQuestGroupId = player.Player.quests.groupID.m_SteamID;
+
+                if (questGroupId != 0)
+                    pData.LastQuestGroupId = questGroupId;
+
                 pData.SteamGroup = playerId.group.m_SteamID;
                 pData.SteamGroupName = groupName;
                 pData.SteamName = playerId.playerName;
