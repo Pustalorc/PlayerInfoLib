@@ -2,7 +2,7 @@
 // ReSharper disable IdentifierTypo
 // Auto-Generated with Visual Studio special pasting (JSON as Classes)
 
-namespace Pustalorc.PlayerInfoLib.Unturned.SteamWebApiClasses
+namespace Pustalorc.PlayerInfoLib.Unturned.API.Classes.SteamWebApiClasses
 {
     public class Player
     {

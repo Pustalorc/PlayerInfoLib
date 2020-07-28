@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using OpenMod.API.Ioc;
 using OpenMod.API.Prioritization;
 using OpenMod.API.Users;
+using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
+using Pustalorc.PlayerInfoLib.Unturned.API.Services;
 using SDG.Unturned;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Database

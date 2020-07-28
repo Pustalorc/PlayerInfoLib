@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Pustalorc.PlayerInfoLib.Unturned.Database
+namespace Pustalorc.PlayerInfoLib.Unturned.API.Classes
 {
     public class Server
     {

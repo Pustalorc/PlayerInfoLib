@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using OpenMod.EntityFrameworkCore;
+using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Database
 {

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using OpenMod.API.Plugins;
 using OpenMod.EntityFrameworkCore.Extensions;
 using OpenMod.Unturned.Plugins;
+using Pustalorc.PlayerInfoLib.Unturned.API.Services;
 using Pustalorc.PlayerInfoLib.Unturned.Database;
 
 [assembly:
