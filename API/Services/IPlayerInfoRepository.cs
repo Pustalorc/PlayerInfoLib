@@ -108,26 +108,6 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
         void AddPlayerData(PlayerData playerData);
 
         /// <summary>
-        /// Builds player data from the specific details.
-        /// </summary>
-        /// <param name="steamId">The player's steam64id.</param>
-        /// <param name="characterName">The player's character name.</param>
-        /// <param name="steamName">The player's steam name.</param>
-        /// <param name="hwid">The player's HWID.</param>
-        /// <param name="ip">The player's IP.</param>
-        /// <param name="profileHash">The player's profile picture hash.</param>
-        /// <param name="questGroup">The player's last quest group ID.</param>
-        /// <param name="steamGroup">The player's selected steam group ID.</param>
-        /// <param name="steamGroupName">The player's selected steam group Name.</param>
-        /// <param name="totalPlaytime">The player's total playtime.</param>
-        /// <param name="lastLogin">The last DateTime that the player logged in.</param>
-        /// <param name="server">The instance of the server that the data belongs to.</param>
-        /// <returns>A built instance of PlayerData from the placed values.</returns>
-        PlayerData BuildPlayerData(ulong steamId, string characterName, string steamName, string hwid, uint ip,
-            string profileHash, ulong questGroup, ulong steamGroup, string steamGroupName, double totalPlaytime,
-            DateTime lastLogin, Server server);
-
-        /// <summary>
         /// Saves all changes made in the context to the database.
         /// </summary>
         /// <returns>A task that represents the asynchronous save operation. The task result contains the number of state entries written to the database.</returns>

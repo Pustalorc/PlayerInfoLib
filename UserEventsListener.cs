@@ -43,7 +43,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
 
             if (pData == null)
             {
-                pData = m_PlayerInfoRepository.BuildPlayerData(steamId.m_SteamID, player.DisplayName,
+                pData = BuildPlayerData(steamId.m_SteamID, player.DisplayName,
                     playerId.playerName, hwid, ip,
                     pfpHash, player.Player.quests.groupID.m_SteamID, playerId.group.m_SteamID, groupName, 0,
                     DateTime.Now, server);
@@ -85,7 +85,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
 
             if (pData == null)
             {
-                pData = m_PlayerInfoRepository.BuildPlayerData(steamId.m_SteamID, player.DisplayName,
+                pData = BuildPlayerData(steamId.m_SteamID, player.DisplayName,
                     playerId.playerName, hwid, ip,
                     pfpHash, player.Player.quests.groupID.m_SteamID, playerId.group.m_SteamID, groupName, 0,
                     DateTime.Now, server);
@@ -110,6 +110,27 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 await m_PlayerInfoRepository.SaveChangesAsync();
             }
         }
+
+        private PlayerData BuildPlayerData(ulong steamId, string characterName, string steamName, string hwid, uint ip,string profileHash, ulong questGroup, ulong steamGroup, string steamGroupName, double totalPlaytime,DateTime lastLogin, Server server)
+        {
+            return new PlayerData
+            {
+                Id = steamId,
+                CharacterName = characterName,
+                SteamName = steamName,
+                Hwid = hwid,
+                Ip = ip,
+                ProfilePictureHash = profileHash,
+                LastQuestGroupId = questGroup,
+                SteamGroup = steamGroup,
+                SteamGroupName = steamGroupName,
+                TotalPlaytime = totalPlaytime,
+                LastLoginGlobal = lastLogin,
+                ServerId = server.Id,
+                Server = server
+            };
+        }
+
 
         [ItemNotNull]
         private async Task<string> GetProfilePictureHashAsync(CSteamID user)

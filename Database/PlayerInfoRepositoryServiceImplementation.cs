@@ -182,28 +182,6 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
             m_DbContext.SaveChanges();
         }
 
-        public PlayerData BuildPlayerData(ulong steamId, string characterName, string steamName, string hwid, uint ip,
-            string profileHash, ulong questGroup, ulong steamGroup, string steamGroupName, double totalPlaytime,
-            DateTime lastLogin, Server server)
-        {
-            return new PlayerData
-            {
-                Id = steamId,
-                CharacterName = characterName,
-                SteamName = steamName,
-                Hwid = hwid,
-                Ip = ip,
-                ProfilePictureHash = profileHash,
-                LastQuestGroupId = questGroup,
-                SteamGroup = steamGroup,
-                SteamGroupName = steamGroupName,
-                TotalPlaytime = totalPlaytime,
-                LastLoginGlobal = lastLogin,
-                ServerId = server.Id,
-                Server = server
-            };
-        }
-
         public async Task<int> SaveChangesAsync()
         {
             return await m_DbContext.SaveChangesAsync();
