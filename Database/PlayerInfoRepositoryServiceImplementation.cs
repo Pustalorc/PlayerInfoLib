@@ -133,9 +133,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
         {
             return searchMode switch
             {
-                UserSearchMode.Id => GetPlayerByIdInternal(searchTerm),
-                UserSearchMode.Name => GetPlayerByNameInternal(searchTerm),
-                UserSearchMode.NameOrId => GetPlayerByIdInternal(searchTerm)
+                UserSearchMode.FindById => GetPlayerByIdInternal(searchTerm),
+                UserSearchMode.FindByName => GetPlayerByNameInternal(searchTerm),
+                UserSearchMode.FindByNameOrId => GetPlayerByIdInternal(searchTerm)
                     .Concat(GetPlayerByNameInternal(searchTerm)),
                 _ => m_DbContext.Players.Take(0)
             };

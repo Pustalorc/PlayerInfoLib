@@ -11,7 +11,9 @@ using Newtonsoft.Json;
 using OpenMod.API.Eventing;
 using OpenMod.API.Users;
 using OpenMod.Core.Users.Events;
+using OpenMod.Unturned.Players.Events.Connections;
 using OpenMod.Unturned.Users;
+using OpenMod.Unturned.Users.Events;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes.SteamWebApiClasses;
 using Pustalorc.PlayerInfoLib.Unturned.API.Services;
@@ -19,7 +21,7 @@ using Steamworks;
 
 namespace Pustalorc.PlayerInfoLib.Unturned
 {
-    public class UserEventsListener : IEventListener<UserConnectedEvent>, IEventListener<UserDisconnectedEvent>
+    public class UserEventsListener : IEventListener<UnturnedPlayerConnectedEvent>, IEventListener<UnturnedPlayerDisconnectedEvent>
     {
         private readonly IPlayerInfoRepository m_PlayerInfoRepository;
         private readonly IConfiguration m_Configuration;
@@ -30,10 +32,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             m_Configuration = configuration;
         }
 
-        public async Task HandleEventAsync(object sender, UserConnectedEvent @event)
+        public async Task HandleEventAsync(object sender, UnturnedPlayerConnectedEvent @event)
         {
-            if (!(@event.User is UnturnedUser player)) return;
-
+            var player = @event.Player;
             var playerId = player.SteamPlayer.playerID;
             var steamId = player.SteamId;
             var pfpHash = await GetProfilePictureHashAsync(steamId);
@@ -43,13 +44,13 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             var ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
             var questGroupId = player.Player.quests.groupID.m_SteamID;
 
-            var pData = await m_PlayerInfoRepository.FindPlayerAsync(steamId.ToString(), UserSearchMode.Id);
+            var pData = await m_PlayerInfoRepository.FindPlayerAsync(steamId.ToString(), UserSearchMode.FindById);
             var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ??
                          await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
 
             if (pData == null)
             {
-                pData = BuildPlayerData(steamId.m_SteamID, player.DisplayName,
+                pData = BuildPlayerData(steamId.m_SteamID, player.SteamPlayer.playerID.characterName,
                     playerId.playerName, hwid, ip,
                     pfpHash, questGroupId, playerId.group.m_SteamID, groupName, 0,
                     DateTime.Now, server);
@@ -59,7 +60,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             else
             {
                 pData.ProfilePictureHash = pfpHash;
-                pData.CharacterName = player.DisplayName;
+                pData.CharacterName = player.SteamPlayer.playerID.characterName;
                 pData.Hwid = hwid;
                 pData.Ip = ip;
                 pData.LastLoginGlobal = DateTime.Now;
@@ -77,10 +78,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             }
         }
 
-        public async Task HandleEventAsync(object sender, UserDisconnectedEvent @event)
+        public async Task HandleEventAsync(object sender, UnturnedPlayerDisconnectedEvent @event)
         {
-            if (!(@event.User is UnturnedUser player)) return;
-
+            var player = @event.Player;
             var playerId = player.SteamPlayer.playerID;
             var steamId = player.SteamId;
             var pfpHash = await GetProfilePictureHashAsync(steamId);
@@ -89,13 +89,13 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             SteamGameServerNetworking.GetP2PSessionState(steamId, out var sessionState);
             var ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
 
-            var pData = await m_PlayerInfoRepository.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.Id);
+            var pData = await m_PlayerInfoRepository.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.FindById);
             var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ??
                          await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
 
             if (pData == null)
             {
-                pData = BuildPlayerData(steamId.m_SteamID, player.DisplayName,
+                pData = BuildPlayerData(steamId.m_SteamID, player.SteamPlayer.playerID.characterName,
                     playerId.playerName, hwid, ip,
                     pfpHash, player.Player.quests.groupID.m_SteamID, playerId.group.m_SteamID, groupName, 0,
                     DateTime.Now, server);

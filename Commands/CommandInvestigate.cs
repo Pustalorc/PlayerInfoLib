@@ -28,7 +28,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
             var actor = Context.Actor;
             var targetPlayer = await Context.Parameters.GetAsync<string>(0);
 
-            var players = await m_PlayerInfoRepository.FindMultiplePlayersAsync(targetPlayer, UserSearchMode.NameOrId);
+            var players = await m_PlayerInfoRepository.FindMultiplePlayersAsync(targetPlayer, UserSearchMode.FindByNameOrId);
 
             if (!players.Any())
             {

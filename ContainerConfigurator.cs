@@ -8,11 +8,10 @@ namespace Pustalorc.PlayerInfoLib.Unturned
 {
     public class ContainerConfigurator : IPluginContainerConfigurator
     {
-        public void ConfigureContainer(ILifetimeScope parentLifetimeScope, IConfiguration configuration,
-            ContainerBuilder containerBuilder)
+        public void ConfigureContainer(IPluginServiceConfigurationContext context)
         {
-            containerBuilder.AddEntityFrameworkCoreMySql();
-            containerBuilder.AddDbContext<PlayerInfoLibDbContext>();
+            context.ContainerBuilder.AddEntityFrameworkCoreMySql();
+            context.ContainerBuilder.AddDbContext<PlayerInfoLibDbContext>();
         }
     }
 }
