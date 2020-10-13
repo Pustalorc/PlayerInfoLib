@@ -11,7 +11,8 @@
     <AssemblyName>Pustalorc.PlayerInfoLib.Unturned</AssemblyName>
     <LangVersion>8</LangVersion>
     <Description>A library to store more information about unturned players.</Description>
-    <PackageReleaseNotes>Updated to latest OpenMod version (2.0.0)</PackageReleaseNotes>
+    <PackageReleaseNotes>Updated to latest OpenMod version.
+Fixed an issue with IPs always being 0.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib</PackageProjectUrl>
@@ -25,10 +26,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenMod.EntityFrameworkCore" Version="2.1.2" />
-    <PackageReference Include="OpenMod.Unturned" Version="2.1.2" />
-	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.20.9" />
-	<PackageReference Include="OpenMod.UnityEngine.Redist" Version="2018.4.23" />
+    <PackageReference Include="OpenMod.EntityFrameworkCore" Version="2.2.0" />
+    <PackageReference Include="OpenMod.Unturned" Version="2.2.0" />
+	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.20.11" />
+	<PackageReference Include="OpenMod.UnityEngine.Redist" Version="2019.3.5" />
     <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
