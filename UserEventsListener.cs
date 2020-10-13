@@ -37,8 +37,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             var pfpHash = await GetProfilePictureHashAsync(steamId);
             var groupName = await GetSteamGroupNameAsync(playerId.group);
             var hwid = string.Join("", playerId.hwid);
-            SteamGameServerNetworking.GetP2PSessionState(steamId, out var sessionState);
-            var ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
+            if (!player.SteamPlayer.transportConnection.TryGetIPv4Address(out var ip))
+                ip = uint.MinValue;
             var questGroupId = player.Player.quests.groupID.m_SteamID;
 
             var pData = await m_PlayerInfoRepository.FindPlayerAsync(steamId.ToString(), UserSearchMode.FindById);
@@ -83,8 +83,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             var pfpHash = await GetProfilePictureHashAsync(steamId);
             var groupName = await GetSteamGroupNameAsync(playerId.group);
             var hwid = string.Join("", playerId.hwid);
-            SteamGameServerNetworking.GetP2PSessionState(steamId, out var sessionState);
-            var ip = sessionState.m_nRemoteIP == 0 ? uint.MinValue : sessionState.m_nRemoteIP;
+            if (!player.SteamPlayer.transportConnection.TryGetIPv4Address(out var ip))
+                ip = uint.MinValue;
 
             var pData = await m_PlayerInfoRepository.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.FindById);
             var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ??
