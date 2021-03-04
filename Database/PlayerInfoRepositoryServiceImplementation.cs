@@ -18,7 +18,7 @@ using SDG.Unturned;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Database
 {
-    [ServiceImplementation(Lifetime = ServiceLifetime.Scoped, Priority = Priority.Normal)]
+    [PluginServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
     public class PlayerInfoRepositoryServiceImplementation : IPlayerInfoRepository
     {
         private readonly PlayerInfoLibDbContext m_DbContext;
@@ -123,7 +123,6 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
             return await FindMultiplePlayersInternal(searchTerm, searchMode).ToListAsync();
         }
 
-        [ItemNotNull]
         public List<PlayerData> FindMultiplePlayers(string searchTerm, UserSearchMode searchMode)
         {
             return FindMultiplePlayersInternal(searchTerm, searchMode).ToList();

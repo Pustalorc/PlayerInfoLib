@@ -22,14 +22,14 @@ Fixed an issue with IPs always being 0.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.8">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.12">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenMod.EntityFrameworkCore" Version="2.2.0" />
-    <PackageReference Include="OpenMod.Unturned" Version="2.2.0" />
-	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.20.11" />
-	<PackageReference Include="OpenMod.UnityEngine.Redist" Version="2019.3.5" />
+    <PackageReference Include="OpenMod.EntityFrameworkCore" Version="3.0.17" />
+    <PackageReference Include="OpenMod.Unturned" Version="3.0.17" />
+	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.21.8" />
+	<PackageReference Include="OpenMod.UnityEngine.Redist" Version="2019.4.10" />
     <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>

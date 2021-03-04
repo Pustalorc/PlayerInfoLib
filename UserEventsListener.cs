@@ -134,8 +134,6 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             };
         }
 
-
-        [ItemNotNull]
         private async Task<string> GetProfilePictureHashAsync(CSteamID user)
         {
             var apiKey = m_Configuration["steamWebApiKey"];
@@ -154,7 +152,6 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                    "";
         }
 
-        [ItemNotNull]
         private static async Task<string> GetSteamGroupNameAsync(CSteamID groupId)
         {
             using var web = new WebClient();
