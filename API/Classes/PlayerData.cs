@@ -9,10 +9,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned.API.Classes
 {
     public class PlayerData
     {
-        [Column("Id", TypeName = "BIGINT UNSIGNED")]
         [Key]
         [Required]
-        public ulong Id { get; set; }
+        public string Id { get; set; }
 
         [Required] [StringLength(64)] public string SteamName { get; set; }
 
@@ -20,15 +19,13 @@ namespace Pustalorc.PlayerInfoLib.Unturned.API.Classes
 
         [Required] [StringLength(64)] public string ProfilePictureHash { get; set; }
 
-        [Column("LastQuestGroupId", TypeName = "BIGINT UNSIGNED")]
         [Required]
         [DefaultValue(0)]
-        public ulong LastQuestGroupId { get; set; }
+        public string LastQuestGroupId { get; set; }
 
-        [Column("SteamGroup", TypeName = "BIGINT UNSIGNED")]
         [Required]
         [DefaultValue(0)]
-        public ulong SteamGroup { get; set; }
+        public string SteamGroup { get; set; }
 
         [Required]
         [StringLength(64)]

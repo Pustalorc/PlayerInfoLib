@@ -162,7 +162,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
             if (!ulong.TryParse(searchTerm, out var id) || id < 76561197960265728 || id > 103582791429521408)
                 return m_DbContext.Players.Take(0);
 
-            return m_DbContext.Players.Where(k => k.Id == id);
+            return m_DbContext.Players.Where(k => k.Id.Equals(id.ToString(), StringComparison.OrdinalIgnoreCase));
         }
 
         private IQueryable<PlayerData> GetPlayerByNameInternal(string searchTerm)

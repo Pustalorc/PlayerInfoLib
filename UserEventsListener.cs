@@ -63,9 +63,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 pData.LastLoginGlobal = DateTime.Now;
 
                 if (questGroupId != 0)
-                    pData.LastQuestGroupId = questGroupId;
+                    pData.LastQuestGroupId = questGroupId.ToString();
 
-                pData.SteamGroup = playerId.group.m_SteamID;
+                pData.SteamGroup = playerId.group.m_SteamID.ToString();
                 pData.SteamGroupName = groupName;
                 pData.SteamName = playerId.playerName;
                 pData.Server = server;
@@ -102,8 +102,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned
             else
             {
                 pData.ProfilePictureHash = pfpHash;
-                pData.LastQuestGroupId = player.Player.quests.groupID.m_SteamID;
-                pData.SteamGroup = playerId.group.m_SteamID;
+                pData.LastQuestGroupId = player.Player.quests.groupID.m_SteamID.ToString();
+                pData.SteamGroup = playerId.group.m_SteamID.ToString();
                 pData.SteamGroupName = groupName;
                 pData.SteamName = playerId.playerName;
                 pData.TotalPlaytime += DateTime.Now.Subtract(pData.LastLoginGlobal).TotalSeconds;
@@ -118,14 +118,14 @@ namespace Pustalorc.PlayerInfoLib.Unturned
         {
             return new PlayerData
             {
-                Id = steamId,
+                Id = steamId.ToString(),
                 CharacterName = characterName,
                 SteamName = steamName,
                 Hwid = hwid,
                 Ip = ip,
                 ProfilePictureHash = profileHash,
-                LastQuestGroupId = questGroup,
-                SteamGroup = steamGroup,
+                LastQuestGroupId = questGroup.ToString(),
+                SteamGroup = steamGroup.ToString(),
                 SteamGroupName = steamGroupName,
                 TotalPlaytime = totalPlaytime,
                 LastLoginGlobal = lastLogin,
