@@ -1,8 +1,8 @@
-﻿using OpenMod.EntityFrameworkCore;
+using OpenMod.EntityFrameworkCore.MySql;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Database
 {
-    public class PlayerInfoLibDbContextFactory : OpenModDbContextFactory<PlayerInfoLibDbContext>
+    public class PlayerInfoLibDbContextFactory : OpenModMySqlDbContextFactory<PlayerInfoLibDbContext>
     {
     }
 }
