@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-using MySql.Data.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
 {
@@ -27,7 +27,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
                 nullable: false,
                 oldClrType: typeof(long),
                 oldType: "BIGINT UNSIGNED")
-                .OldAnnotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn);
+                .OldAnnotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -52,7 +52,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
                 type: "BIGINT UNSIGNED",
                 nullable: false,
                 oldClrType: typeof(string))
-                .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn);
+                .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn);
         }
     }
 }
