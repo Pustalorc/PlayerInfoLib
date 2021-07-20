@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-using MySql.Data.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
 {
@@ -13,7 +13,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Instance = table.Column<string>(maxLength: 128, nullable: false),
                     Name = table.Column<string>(maxLength: 50, nullable: false)
                 },
@@ -66,3 +66,4 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Migrations
         }
     }
 }
+
