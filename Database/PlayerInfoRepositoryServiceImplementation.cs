@@ -1,4 +1,4 @@
-﻿// ReSharper disable AnnotateCanBeNullTypeMember
+// ReSharper disable AnnotateCanBeNullTypeMember
 // ReSharper disable AnnotateNotNullTypeMember
 // ReSharper disable AnnotateNotNullParameter
 
