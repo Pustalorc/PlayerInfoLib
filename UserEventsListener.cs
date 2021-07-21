@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using OpenMod.API.Eventing;
@@ -67,9 +66,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                     pData.LastLoginGlobal = joinTime;
 
                     if (questGroupId != 0)
-                        pData.LastQuestGroupId = questGroupId.ToString();
+                        pData.LastQuestGroupId = questGroupId;
 
-                    pData.SteamGroup = playerId.group.m_SteamID.ToString();
+                    pData.SteamGroup = playerId.group.m_SteamID;
                     pData.SteamGroupName = groupName;
                     pData.SteamName = playerId.playerName;
                     pData.Server = server;
@@ -110,8 +109,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 else
                 {
                     pData.ProfilePictureHash = pfpHash;
-                    pData.LastQuestGroupId = player.Player.quests.groupID.m_SteamID.ToString();
-                    pData.SteamGroup = playerId.group.m_SteamID.ToString();
+                    pData.LastQuestGroupId = player.Player.quests.groupID.m_SteamID;
+                    pData.SteamGroup = playerId.group.m_SteamID;
                     pData.SteamGroupName = groupName;
                     pData.SteamName = playerId.playerName;
                     pData.TotalPlaytime += joinTime.Subtract(pData.LastLoginGlobal).TotalSeconds;
@@ -127,14 +126,14 @@ namespace Pustalorc.PlayerInfoLib.Unturned
         {
             return new PlayerData
             {
-                Id = steamId.ToString(),
+                Id = steamId,
                 CharacterName = characterName,
                 SteamName = steamName,
                 Hwid = hwid,
                 Ip = ip,
                 ProfilePictureHash = profileHash,
-                LastQuestGroupId = questGroup.ToString(),
-                SteamGroup = steamGroup.ToString(),
+                LastQuestGroupId = questGroup,
+                SteamGroup = steamGroup,
                 SteamGroupName = steamGroupName,
                 TotalPlaytime = totalPlaytime,
                 LastLoginGlobal = lastLogin,

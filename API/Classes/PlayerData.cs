@@ -11,7 +11,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.API.Classes
     {
         [Key]
         [Required]
-        public string Id { get; set; }
+        public ulong Id { get; set; }
 
         [Required] [StringLength(64)] public string SteamName { get; set; }
 
@@ -21,11 +21,11 @@ namespace Pustalorc.PlayerInfoLib.Unturned.API.Classes
 
         [Required]
         [DefaultValue(0)]
-        public string LastQuestGroupId { get; set; }
+        public ulong LastQuestGroupId { get; set; }
 
         [Required]
         [DefaultValue(0)]
-        public string SteamGroup { get; set; }
+        public ulong SteamGroup { get; set; }
 
         [Required]
         [StringLength(64)]
@@ -34,7 +34,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.API.Classes
 
         [Required] public string Hwid { get; set; }
 
-        [Required] public long Ip { get; set; }
+        [Required] public uint Ip { get; set; }
 
         [Required] [DefaultValue(0)] public double TotalPlaytime { get; set; }
 

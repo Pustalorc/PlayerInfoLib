@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenMod.API.Ioc;
@@ -162,7 +161,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
             if (!ulong.TryParse(searchTerm, out var id) || id < 76561197960265728 || id > 103582791429521408)
                 return m_DbContext.Players.Take(0);
 
-            return m_DbContext.Players.Where(k => k.Id.Equals(id.ToString(), StringComparison.OrdinalIgnoreCase));
+            return m_DbContext.Players.Where(k => k.Id == id);
         }
 
         private IQueryable<PlayerData> GetPlayerByNameInternal(string searchTerm)
