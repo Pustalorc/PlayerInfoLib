@@ -22,7 +22,7 @@ jobs:
     - name: Install dependencies
       run: dotnet restore
     - name: Update version
-      run: "sed -i \"s#<Version>3.0.0</Version>#<Version>${{ github.event.inputs.version }}</Version>#\" PlayerInfoLib.csproj"  
+      run: "sed -i \"s#<Version>3.3.0</Version>#<Version>${{ github.event.inputs.version }}</Version>#\" PlayerInfoLib.csproj"  
     - name: Build
       run: dotnet build PlayerInfoLib.csproj --configuration Release --no-restore
     - name: Push to NuGet
