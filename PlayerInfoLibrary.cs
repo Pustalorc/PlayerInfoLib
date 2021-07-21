@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OpenMod.API.Plugins;
 using OpenMod.Unturned.Plugins;
@@ -7,14 +8,12 @@ using Pustalorc.PlayerInfoLib.Unturned.API.Services;
 using Pustalorc.PlayerInfoLib.Unturned.Database;
 
 [assembly:
-
-    PluginMetadata("Pustalorc.PlayerInfoLib.Unturned", Author = "Pustalorc",
+    PluginMetadata("Pustalorc.PlayerInfoLib.Unturned", Author = "Pustalorc, Nuage",
         DisplayName = "Player Info Library Unturned",
         Website = "https://github.com/Pustalorc/PlayerInfoLib/")]
 
 namespace Pustalorc.PlayerInfoLib.Unturned
 {
-
     public class PlayerInfoLibrary : OpenModUnturnedPlugin
     {
         private readonly ILogger<PlayerInfoLibrary> m_Logger;
@@ -24,9 +23,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
         private readonly IPlayerInfoRepository m_PlayerInfoRepository;
 
         public PlayerInfoLibrary(ILogger<PlayerInfoLibrary> logger, IServiceProvider serviceProvider,
-
             PlayerInfoLibDbContext dbContext, IPlayerInfoRepository playerInfoRepository) : base(serviceProvider)
-
         {
             m_Logger = logger;
 
@@ -37,7 +34,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
 
         protected override async UniTask OnLoadAsync()
         {
-            await m_DbContext.OpenModMigrateAsync();
+            await m_DbContext.Database.MigrateAsync();
 
             await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
 

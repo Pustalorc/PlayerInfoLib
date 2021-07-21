@@ -11,14 +11,14 @@
     <AssemblyName>Pustalorc.PlayerInfoLib.Unturned</AssemblyName>
     <LangVersion>8</LangVersion>
     <Description>A library to store more information about unturned players.</Description>
-    <PackageReleaseNotes>Updated to latest OpenMod version.
-Fixed an issue with IPs always being 0.</PackageReleaseNotes>
+    <PackageReleaseNotes>Switched to Pomelo EFCore.
+Update to latest EFCore versions.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib</PackageProjectUrl>
-    <Copyright>Copyright © 2020 Pustalorc</Copyright>
+    <Copyright>Copyright © 2020-2021 Pustalorc, Nuage</Copyright>
     <Version>3.3.0</Version>
-    <Authors>Pustalorc</Authors>
+    <Authors>Pustalorc, Nuage</Authors>
   </PropertyGroup>
 
   <ItemGroup>

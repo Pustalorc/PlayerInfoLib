@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using OpenMod.EntityFrameworkCore;
+using OpenMod.EntityFrameworkCore.Configurator;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Database
@@ -11,14 +12,8 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
         public DbSet<Server> Servers { get; set; }
         public DbSet<PlayerData> Players { get; set; }
 
-        public PlayerInfoLibDbContext(DbContextOptions<PlayerInfoLibDbContext> options,
-            IServiceProvider serviceProvider) : base((OpenMod.EntityFrameworkCore.Configurator.IDbContextConfigurator)options, serviceProvider)
+        public PlayerInfoLibDbContext(IDbContextConfigurator configurator, IServiceProvider serviceProvider) : base(configurator, serviceProvider)
         {
-        }
-
-        internal Task OpenModMigrateAsync()
-        {
-            throw new NotImplementedException();
         }
     }
 }
