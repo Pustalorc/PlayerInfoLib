@@ -1,6 +1,7 @@
 using OpenMod.API.Plugins;
 using Pustalorc.PlayerInfoLib.Unturned.Database;
 using OpenMod.EntityFrameworkCore.MySql.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Pustalorc.PlayerInfoLib.Unturned
 {
@@ -8,7 +9,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
     {
         public void ConfigureContainer(IPluginServiceConfigurationContext context)
         {
-            context.ContainerBuilder.AddMySqlDbContext<PlayerInfoLibDbContext>();
+            context.ContainerBuilder.AddMySqlDbContext<PlayerInfoLibDbContext>(ServiceLifetime.Transient);
         }
     }
 }

@@ -18,7 +18,7 @@ using SDG.Unturned;
 namespace Pustalorc.PlayerInfoLib.Unturned.Database
 {
     [PluginServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Lowest)]
-    public class PlayerInfoRepositoryServiceImplementation : IPlayerInfoRepository, IAsyncDisposable
+    public class PlayerInfoRepositoryServiceImplementation : IPlayerInfoRepository
     {
         private readonly PlayerInfoLibDbContext m_DbContext;
 
