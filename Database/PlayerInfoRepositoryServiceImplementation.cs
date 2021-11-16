@@ -17,7 +17,7 @@ using SDG.Unturned;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Database
 {
-    [PluginServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
+    [PluginServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Lowest)]
     public class PlayerInfoRepositoryServiceImplementation : IPlayerInfoRepository
     {
         private readonly PlayerInfoLibDbContext m_DbContext;
@@ -197,6 +197,11 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
         public int SaveChanges()
         {
             return m_DbContext.SaveChanges();
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            return m_DbContext.DisposeAsync();
         }
     }
 }
