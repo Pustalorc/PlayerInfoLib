@@ -2,10 +2,8 @@
 // ReSharper disable AnnotateNotNullTypeMember
 // ReSharper disable AnnotateNotNullParameter
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+extern alias JetBrainsAnnotations;
+using JetBrainsAnnotations::JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using OpenMod.API.Ioc;
@@ -14,10 +12,15 @@ using OpenMod.API.Users;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
 using Pustalorc.PlayerInfoLib.Unturned.API.Services;
 using SDG.Unturned;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Database
 {
     [PluginServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Lowest)]
+    [UsedImplicitly]
     public class PlayerInfoRepositoryServiceImplementation : IPlayerInfoRepository
     {
         private readonly PlayerInfoLibDbContext m_DbContext;

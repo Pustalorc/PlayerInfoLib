@@ -44,4 +44,13 @@ Update to latest EFCore versions.</PackageReleaseNotes>
     <EmbeddedResource Include="config.yaml" />
     <EmbeddedResource Include="translations.yaml" />
   </ItemGroup>
+
+
+  <Target Name="ChangeAliasesOfNugetRefs" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+    <ItemGroup>
+      <ReferencePath Condition="'%(FileName)' == 'JetBrains.Annotations'">
+        <Aliases>JetBrainsAnnotations</Aliases>
+      </ReferencePath>
+    </ItemGroup>
+  </Target>
 </Project>
