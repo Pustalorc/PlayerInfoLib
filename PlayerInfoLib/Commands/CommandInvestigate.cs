@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Localization;
 using OpenMod.API.Users;
 using OpenMod.Core.Commands;
+using Pustalorc.PlayerInfoLib.Unturned.API.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Pustalorc.PlayerInfoLib.Unturned.API.Services;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Commands
 {
@@ -14,12 +13,14 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
     [CommandDescription("Investigates and gets information about a player.")]
     public class CommandInvestigate : Command
     {
-        private readonly IServiceProvider m_ServiceProvider;
+        private readonly IPlayerInfoRepository m_PlayerInfoRepository;
         private readonly IStringLocalizer m_StringLocalizer;
 
-        public CommandInvestigate(IServiceProvider serviceProvider, IStringLocalizer stringLocalizer) : base(serviceProvider)
+        public CommandInvestigate(IPlayerInfoRepository playerInfoRepository,
+            IStringLocalizer stringLocalizer,
+            IServiceProvider serviceProvider) : base(serviceProvider)
         {
-            m_ServiceProvider = serviceProvider;
+            m_PlayerInfoRepository = playerInfoRepository;
             m_StringLocalizer = stringLocalizer;
         }
 
@@ -28,9 +29,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
             var actor = Context.Actor;
             var targetPlayer = await Context.Parameters.GetAsync<string>(0);
 
-            await using var playerInfoRepository = m_ServiceProvider.GetRequiredService<IPlayerInfoRepository>();
-
-            var players = await playerInfoRepository.FindMultiplePlayersAsync(targetPlayer, UserSearchMode.FindByNameOrId);
+            var players = await m_PlayerInfoRepository.FindMultiplePlayersAsync(targetPlayer, UserSearchMode.FindByNameOrId);
 
             if (!players.Any())
             {
@@ -40,7 +39,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
             {
                 await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_count", new {players.Count}]);
                 var firstResult = players.First();
-                var server = firstResult.Server ?? await playerInfoRepository.GetServerAsync(firstResult.ServerId);
+                var server = firstResult.Server ?? await m_PlayerInfoRepository.GetServerAsync(firstResult.ServerId);
                 var timeSpan = TimeSpan.FromSeconds(firstResult.TotalPlaytime);
 
                 await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_text",
