@@ -23,36 +23,74 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
     [UsedImplicitly]
     public class PlayerInfoRepositoryServiceImplementation : IPlayerInfoRepository
     {
-        private readonly PlayerInfoLibDbContext m_DbContext;
+        private readonly IServiceProvider m_ServiceProvider;
 
-        public PlayerInfoRepositoryServiceImplementation(PlayerInfoLibDbContext dbContext)
+        public PlayerInfoRepositoryServiceImplementation(IServiceProvider serviceProvider)
         {
-            m_DbContext = dbContext;
+            m_ServiceProvider = serviceProvider;
         }
+
+        #region Database Operation Handlers
+
+        private PlayerInfoLibDbContext GetDbContext()
+        {
+            return m_ServiceProvider.GetRequiredService<PlayerInfoLibDbContext>();
+        }
+
+        private async Task RunOperation(Func<PlayerInfoLibDbContext, Task> action)
+        {
+            await using var dbContext = GetDbContext();
+
+            await action(dbContext);
+        }
+
+        private async Task<T> RunOperation<T>(Func<PlayerInfoLibDbContext, Task<T>> action)
+        {
+            await using var dbContext = GetDbContext();
+
+            return await action(dbContext);
+        }
+
+        private void RunOperation(Action<PlayerInfoLibDbContext> action)
+        {
+            using var dbContext = GetDbContext();
+
+            action(dbContext);
+        }
+
+        private T RunOperation<T>(Func<PlayerInfoLibDbContext, T> action)
+        {
+            using var dbContext = GetDbContext();
+
+            return action(dbContext);
+        }
+
+        #endregion
 
         #region Get Servers
 
         public async Task<Server> GetCurrentServerAsync()
         {
-            if (!await CheckCurrentServerExistsAsync())
-                return null;
-
-            return await GetCurrentServerInternalAsync();
+            return await RunOperation(GetCurrentServerInternalAsync);
         }
 
         public Server GetCurrentServer()
         {
-            return !CheckCurrentServerExists() ? null : GetCurrentServerInternal();
+            return RunOperation(GetCurrentServerInternal);
         }
 
         public async Task<Server> GetServerAsync(int id)
         {
-            return await m_DbContext.Servers.FirstOrDefaultAsync(k => k.Id == id);
+            await using var dbContext = GetDbContext();
+
+            return await dbContext.Servers.FirstOrDefaultAsync(k => k.Id == id);
         }
 
         public Server GetServer(int id)
         {
-            return m_DbContext.Servers.FirstOrDefault(k => k.Id == id);
+            using var dbContext = GetDbContext();
+            
+            return dbContext.Servers.FirstOrDefault(k => k.Id == id);
         }
 
         #endregion
@@ -61,49 +99,76 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
 
         public async Task<bool> CheckCurrentServerExistsAsync()
         {
-            var server = await GetCurrentServerInternalAsync();
+            return await RunOperation(async dbContext =>
+            {
+                var server = await GetCurrentServerInternalAsync(dbContext);
 
-            return server != null;
+                return server != null;
+            });
         }
 
         public bool CheckCurrentServerExists()
         {
-            var server = GetCurrentServerInternal();
+            return RunOperation(dbContext =>
+            {
+                var server = GetCurrentServerInternal(dbContext);
 
-            return server != null;
+                return server != null;
+            });
         }
 
         public async Task<Server> CheckAndRegisterCurrentServerAsync()
         {
-            var server = await GetCurrentServerInternalAsync();
-            if (server == null)
-                await m_DbContext.Servers.AddAsync(new Server
+            return await RunOperation(async dbContext =>
+            {
+                var server = await GetCurrentServerInternalAsync(dbContext);
+
+                if (server == null)
                 {
-                    Instance = Provider.serverID,
-                    Name = Provider.serverName
-                });
-            else
-                server.Name = Provider.serverName;
+                    server = new Server
+                    {
+                        Instance = Provider.serverID,
+                        Name = Provider.serverName
+                    };
 
-            await m_DbContext.SaveChangesAsync();
+                    await dbContext.Servers.AddAsync(server);
+                }
+                else
+                {
+                    server.Name = Provider.serverName;
+                }
 
-            return server;
+                await dbContext.SaveChangesAsync();
+
+                return server;
+            });
         }
 
         public Server CheckAndRegisterCurrentServer()
         {
-            var server = GetCurrentServerInternal();
-            if (server == null)
-                m_DbContext.Servers.Add(new Server
-                {
-                    Instance = Provider.serverID,
-                    Name = Provider.serverName
-                });
-            else
-                server.Name = Provider.serverName;
+            return RunOperation(dbContext =>
+            {
+                var server = GetCurrentServerInternal(dbContext);
 
-            m_DbContext.SaveChanges();
-            return server;
+                if (server == null)
+                {
+                    server = new Server
+                    {
+                        Instance = Provider.serverID,
+                        Name = Provider.serverName
+                    };
+
+                    dbContext.Servers.Add(server);
+                }
+                else
+                {
+                    server.Name = Provider.serverName;
+                }
+
+                dbContext.SaveChanges();
+
+                return server;
+            });
         }
 
         #endregion
@@ -112,33 +177,36 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
 
         public async Task<PlayerData> FindPlayerAsync(string searchTerm, UserSearchMode searchMode)
         {
-            return await FindMultiplePlayersInternal(searchTerm, searchMode).FirstOrDefaultAsync();
+            return await RunOperation(dbContext =>
+                FindMultiplePlayersInternal(dbContext, searchTerm, searchMode).FirstOrDefaultAsync());
         }
 
         public PlayerData FindPlayer(string searchTerm, UserSearchMode searchMode)
         {
-            return FindMultiplePlayersInternal(searchTerm, searchMode).FirstOrDefault();
+            return RunOperation(dbContext =>
+                FindMultiplePlayersInternal(dbContext, searchTerm, searchMode).FirstOrDefault());
         }
 
         public async Task<List<PlayerData>> FindMultiplePlayersAsync(string searchTerm, UserSearchMode searchMode)
         {
-            return await FindMultiplePlayersInternal(searchTerm, searchMode).ToListAsync();
+            return await RunOperation(dbContext =>
+                FindMultiplePlayersInternal(dbContext, searchTerm, searchMode).ToListAsync());
         }
 
         public List<PlayerData> FindMultiplePlayers(string searchTerm, UserSearchMode searchMode)
         {
-            return FindMultiplePlayersInternal(searchTerm, searchMode).ToList();
+            return RunOperation(dbContext => FindMultiplePlayersInternal(dbContext, searchTerm, searchMode).ToList());
         }
 
-        private IQueryable<PlayerData> FindMultiplePlayersInternal(string searchTerm, UserSearchMode searchMode)
+        private IQueryable<PlayerData> FindMultiplePlayersInternal(PlayerInfoLibDbContext dbContext, string searchTerm, UserSearchMode searchMode)
         {
             return searchMode switch
             {
-                UserSearchMode.FindById => GetPlayerByIdInternal(searchTerm),
-                UserSearchMode.FindByName => GetPlayerByNameInternal(searchTerm),
-                UserSearchMode.FindByNameOrId => GetPlayerByIdInternal(searchTerm)
-                    .Concat(GetPlayerByNameInternal(searchTerm)),
-                _ => m_DbContext.Players.Take(0)
+                UserSearchMode.FindById => GetPlayerByIdInternal(dbContext, searchTerm),
+                UserSearchMode.FindByName => GetPlayerByNameInternal(dbContext, searchTerm),
+                UserSearchMode.FindByNameOrId => GetPlayerByIdInternal(dbContext, searchTerm)
+                    .Concat(GetPlayerByNameInternal(dbContext, searchTerm)),
+                _ => dbContext.Players.Take(0)
             };
         }
 
@@ -146,35 +214,35 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
 
         #region Internal Checks
 
-        private async Task<Server> GetCurrentServerInternalAsync()
+        private async Task<Server> GetCurrentServerInternalAsync(PlayerInfoLibDbContext dbContext)
         {
-            return await m_DbContext.Servers.FirstOrDefaultAsync(k =>
+            return await dbContext.Servers.FirstOrDefaultAsync(k =>
                 k.Instance.Equals(Provider.serverID, StringComparison.Ordinal));
         }
 
-        private Server GetCurrentServerInternal()
+        private Server GetCurrentServerInternal(PlayerInfoLibDbContext dbContext)
         {
-            return m_DbContext.Servers.FirstOrDefault(k =>
+            return dbContext.Servers.FirstOrDefault(k =>
                 k.Instance.Equals(Provider.serverID, StringComparison.Ordinal));
         }
 
 
-        private IQueryable<PlayerData> GetPlayerByIdInternal(string searchTerm)
+        private IQueryable<PlayerData> GetPlayerByIdInternal(PlayerInfoLibDbContext dbContext, string searchTerm)
         {
             if (!ulong.TryParse(searchTerm, out var id) || id < 76561197960265728 || id > 103582791429521408)
-                return m_DbContext.Players.Take(0);
+                return dbContext.Players.Take(0);
 
-            return m_DbContext.Players.Where(k => k.Id == id);
+            return dbContext.Players.Where(k => k.Id == id);
         }
 
-        private IQueryable<PlayerData> GetPlayerByNameInternal(string searchTerm)
+        private IQueryable<PlayerData> GetPlayerByNameInternal(PlayerInfoLibDbContext dbContext, string searchTerm)
         {
             var trimmed = searchTerm.Trim();
             if (string.IsNullOrEmpty(trimmed))
-                return m_DbContext.Players.Take(0);
+                return dbContext.Players.Take(0);
 
             var searchLowered = trimmed.ToLower();
-            return m_DbContext.Players.Where(k =>
+            return dbContext.Players.Where(k =>
                 k.CharacterName.ToLower().Contains(searchLowered) || k.SteamName.ToLower().Contains(searchLowered));
         }
 
@@ -182,29 +250,31 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
 
         public async Task AddPlayerDataAsync(PlayerData playerData)
         {
-            await m_DbContext.Players.AddAsync(playerData);
-            await m_DbContext.SaveChangesAsync();
+            await RunOperation(async dbContext =>
+            {
+                await dbContext.Players.AddAsync(playerData);
+
+                await dbContext.SaveChangesAsync();
+            });
         }
 
         public void AddPlayerData(PlayerData playerData)
         {
-            m_DbContext.Players.Add(playerData);
-            m_DbContext.SaveChanges();
+            RunOperation(dbContext =>
+            {
+                dbContext.Players.Add(playerData);
+                dbContext.SaveChanges();
+            });
         }
 
-        public async Task<int> SaveChangesAsync()
+        public Task<int> SaveChangesAsync()
         {
-            return await m_DbContext.SaveChangesAsync();
+            return Task.FromResult(0);
         }
 
         public int SaveChanges()
         {
-            return m_DbContext.SaveChanges();
-        }
-
-        public ValueTask DisposeAsync()
-        {
-            return m_DbContext.DisposeAsync();
+            return 0;
         }
     }
 }
