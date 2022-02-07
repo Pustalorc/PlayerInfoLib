@@ -33,11 +33,11 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
 
             if (!players.Any())
             {
-                await actor.PrintMessageAsync(m_StringLocalizer["investigate:no_results", new {Target = targetPlayer}]);
+                await actor.PrintMessageAsync(m_StringLocalizer["investigate:no_results", new { Target = targetPlayer }]);
             }
             else
             {
-                await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_count", new {players.Count}]);
+                await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_count", new { players.Count }]);
                 var firstResult = players.First();
                 var server = firstResult.Server ?? await m_PlayerInfoRepository.GetServerAsync(firstResult.ServerId);
                 var timeSpan = TimeSpan.FromSeconds(firstResult.TotalPlaytime);
@@ -45,8 +45,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Commands
                 await actor.PrintMessageAsync(m_StringLocalizer["investigate:result_text",
                     new
                     {
-                        Data = firstResult, ServerName = server?.Name ?? "",
-                        TotalPlaytimeFormatted = m_StringLocalizer["timestamp_format", new {Span = timeSpan}]
+                        Data = firstResult,
+                        ServerName = server?.Name ?? "",
+                        TotalPlaytimeFormatted = m_StringLocalizer["timestamp_format", new { Span = timeSpan }]
                     }]);
             }
         }

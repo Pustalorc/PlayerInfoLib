@@ -33,7 +33,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
         {
             await using var dbContext = m_ServiceProvider.GetRequiredService<PlayerInfoLibDbContext>();
             await dbContext.Database.MigrateAsync();
-            
+
             await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
 
             Logger.LogInformation("Player Info Library for Unturned by Pustalorc was loaded correctly.");

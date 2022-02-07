@@ -1,9 +1,8 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using OpenMod.EntityFrameworkCore;
 using OpenMod.EntityFrameworkCore.Configurator;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
+using System;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Database
 {

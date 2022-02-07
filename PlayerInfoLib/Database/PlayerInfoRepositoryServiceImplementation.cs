@@ -89,7 +89,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
         public Server GetServer(int id)
         {
             using var dbContext = GetDbContext();
-            
+
             return dbContext.Servers.FirstOrDefault(k => k.Id == id);
         }
 
