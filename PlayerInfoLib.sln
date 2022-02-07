@@ -2,7 +2,7 @@
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30320.27
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlayerInfoLibrary", "PlayerInfoLib.csproj", "{1AAA091E-C5EA-4665-A8C3-9830EEA05AEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PlayerInfoLibrary", "PlayerInfoLib\PlayerInfoLib.csproj", "{1AAA091E-C5EA-4665-A8C3-9830EEA05AEB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
