@@ -8,7 +8,7 @@ using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
 namespace Pustalorc.PlayerInfoLib.Unturned.API.Services
 {
     [Service]
-    public interface IPlayerInfoRepository : IAsyncDisposable
+    public interface IPlayerInfoRepository
     {
         /// <summary>
         /// Gets the current server from the Servers DbSet.
