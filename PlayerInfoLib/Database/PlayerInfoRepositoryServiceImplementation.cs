@@ -19,8 +19,8 @@ using System.Threading.Tasks;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.Database
 {
-    [PluginServiceImplementation(Lifetime = ServiceLifetime.Transient, Priority = Priority.Lowest)]
     [UsedImplicitly]
+    [PluginServiceImplementation(Lifetime = ServiceLifetime.Singleton, Priority = Priority.Lowest)]
     public class PlayerInfoRepositoryServiceImplementation : IPlayerInfoRepository
     {
         private readonly IServiceProvider m_ServiceProvider;
