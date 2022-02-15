@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using OpenMod.API.Ioc;
+﻿using OpenMod.API.Ioc;
 using OpenMod.API.Users;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Pustalorc.PlayerInfoLib.Unturned.API.Services
 {
     [Service]
-    public interface IPlayerInfoRepository : IAsyncDisposable
+    public interface IPlayerInfoRepository
     {
         /// <summary>
         /// Gets the current server from the Servers DbSet.

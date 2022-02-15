@@ -1,12 +1,7 @@
 ﻿// ReSharper disable AnnotateNotNullParameter
 // ReSharper disable AnnotateNotNullTypeMember
 
-using System;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using OpenMod.API.Eventing;
 using OpenMod.API.Users;
@@ -16,21 +11,26 @@ using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes.SteamWebApiClasses;
 using Pustalorc.PlayerInfoLib.Unturned.API.Services;
 using Steamworks;
+using System;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace Pustalorc.PlayerInfoLib.Unturned
 {
     public class UserEventsListener : IEventListener<UnturnedPlayerConnectedEvent>, IEventListener<UnturnedPlayerDisconnectedEvent>
     {
-        private readonly IServiceProvider m_ServiceProvider;
+        private readonly IPlayerInfoRepository m_PlayerInfoRepository;
         private readonly IConfiguration m_Configuration;
 
-        public UserEventsListener(IServiceProvider serviceProvider, IConfiguration configuration)
+        public UserEventsListener(IPlayerInfoRepository playerInfoRepository,
+            IConfiguration configuration)
         {
-            m_ServiceProvider = serviceProvider;
+            m_PlayerInfoRepository = playerInfoRepository;
             m_Configuration = configuration;
         }
 
-        public async Task HandleEventAsync(object sender, UnturnedPlayerConnectedEvent @event)
+        public Task HandleEventAsync(object sender, UnturnedPlayerConnectedEvent @event)
         {
             var joinTime = DateTime.Now;
             AsyncHelper.Schedule("PlayerInfoLib_PlayerConnected", async () =>
@@ -45,11 +45,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                     ip = uint.MinValue;
                 var questGroupId = player.Player.quests.groupID.m_SteamID;
 
-                await using var playerInfoRepository = m_ServiceProvider.GetRequiredService<IPlayerInfoRepository>();
-
-                var pData = await playerInfoRepository.FindPlayerAsync(steamId.ToString(), UserSearchMode.FindById);
-                var server = await playerInfoRepository.GetCurrentServerAsync() ??
-                             await playerInfoRepository.CheckAndRegisterCurrentServerAsync();
+                var pData = await m_PlayerInfoRepository.FindPlayerAsync(steamId.ToString(), UserSearchMode.FindById);
+                var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ??
+                             await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
 
                 if (pData == null)
                 {
@@ -58,7 +56,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                         pfpHash, questGroupId, playerId.group.m_SteamID, groupName, 0,
                         joinTime, server);
 
-                    await playerInfoRepository.AddPlayerDataAsync(pData);
+                    await m_PlayerInfoRepository.AddPlayerDataAsync(pData);
                 }
                 else
                 {
@@ -77,12 +75,14 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                     pData.Server = server;
                     pData.ServerId = server.Id;
 
-                    await playerInfoRepository.SaveChangesAsync();
+                    await m_PlayerInfoRepository.SaveChangesAsync();
                 }
             });
+
+            return Task.CompletedTask;
         }
 
-        public async Task HandleEventAsync(object sender, UnturnedPlayerDisconnectedEvent @event)
+        public Task HandleEventAsync(object sender, UnturnedPlayerDisconnectedEvent @event)
         {
             var leaveTime = DateTime.Now;
             AsyncHelper.Schedule("PlayerInfoLib_PlayerDisconnected", async () =>
@@ -94,11 +94,9 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 var groupName = await GetSteamGroupNameAsync(playerId.group);
                 var hwid = string.Join("", playerId.hwid);
 
-                await using var playerInfoRepository = m_ServiceProvider.GetRequiredService<IPlayerInfoRepository>();
-
-                var pData = await playerInfoRepository.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.FindById);
-                var server = await playerInfoRepository.GetCurrentServerAsync() ??
-                             await playerInfoRepository.CheckAndRegisterCurrentServerAsync();
+                var pData = await m_PlayerInfoRepository.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.FindById);
+                var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ??
+                             await m_PlayerInfoRepository.CheckAndRegisterCurrentServerAsync();
 
                 if (pData == null)
                 {
@@ -107,7 +105,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                         pfpHash, player.Player.quests.groupID.m_SteamID, playerId.group.m_SteamID, groupName, 0,
                         leaveTime, server);
 
-                    await playerInfoRepository.AddPlayerDataAsync(pData);
+                    await m_PlayerInfoRepository.AddPlayerDataAsync(pData);
                 }
                 else
                 {
@@ -118,9 +116,11 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                     pData.SteamName = playerId.playerName;
                     pData.TotalPlaytime += leaveTime.Subtract(pData.LastLoginGlobal).TotalSeconds;
 
-                    await playerInfoRepository.SaveChangesAsync();
+                    await m_PlayerInfoRepository.SaveChangesAsync();
                 }
             });
+
+            return Task.CompletedTask;
         }
 
         private static PlayerData BuildPlayerData(ulong steamId, string characterName, string steamName, string hwid, uint ip,
