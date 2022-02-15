@@ -24,7 +24,7 @@ jobs:
     - name: Update version
       run: "sed -i \"s#<Version>3.3.0</Version>#<Version>${{ github.event.inputs.version }}</Version>#\" PlayerInfoLib.csproj"  
     - name: Build
-      run: dotnet build PlayerInfoLib.csproj --configuration Release --no-restore
+      run: dotnet build PlayerInfoLib/PlayerInfoLib.csproj --configuration Release --no-restore
     - name: Push to NuGet
       run: dotnet nuget push bin/Release/*.nupkg
              --api-key ${{ secrets.NUGET_DEPLOY_KEY }}
