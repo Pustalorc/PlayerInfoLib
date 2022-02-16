@@ -1,4 +1,5 @@
-﻿using OpenMod.API.Ioc;
+using System;
+using OpenMod.API.Ioc;
 using OpenMod.API.Users;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
 using System.Collections.Generic;
@@ -102,21 +103,35 @@ namespace Pustalorc.PlayerInfoLib.Unturned.API.Services
         Task AddPlayerDataAsync(PlayerData playerData);
 
         /// <summary>
-        /// Adds player data to the DB Asynchronously.
+        /// Adds player data to the DB synchronously.
         /// </summary>
         /// <param name="playerData">The instance of the player's data.</param>
         void AddPlayerData(PlayerData playerData);
 
         /// <summary>
+        /// Updates player data in the DB Asynchronously.
+        /// </summary>
+        /// <param name="playerData">The instance of the player's data.</param>
+        Task UpdatePlayerDataAsync(PlayerData playerData);
+
+        /// <summary>
+        /// Updates player data in the DB synchronously.
+        /// </summary>
+        /// <param name="playerData">The instance of the player's data.</param>
+        void UpdatePlayerData(PlayerData playerData);
+
+        /// <summary>
         /// Saves all changes made in the context to the database.
         /// </summary>
         /// <returns>A task that represents the asynchronous save operation. The task result contains the number of state entries written to the database.</returns>
+        [Obsolete("UpdatePlayerDataAsync method should be used instead.")]
         Task<int> SaveChangesAsync();
 
         /// <summary>
         /// Saves all changes made in this context to the database.
         /// </summary>
         /// <returns>The number of state entries written to the database.</returns>
+        [Obsolete("UpdatePlayerData method should be used instead.")]
         int SaveChanges();
     }
 }

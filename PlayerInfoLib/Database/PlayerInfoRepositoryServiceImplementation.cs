@@ -267,6 +267,26 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
             });
         }
 
+        public async Task UpdatePlayerDataAsync(PlayerData playerData)
+        {
+            await RunOperation(async dbContext =>
+            {
+                dbContext.Entry(playerData).State = EntityState.Modified;
+
+                await dbContext.SaveChangesAsync();
+            });
+        }
+
+        public void UpdatePlayerData(PlayerData playerData)
+        {
+            RunOperation(dbContext =>
+            {
+                dbContext.Entry(playerData).State = EntityState.Modified;
+
+                dbContext.SaveChanges();
+            });
+        }
+
         public Task<int> SaveChangesAsync()
         {
             return Task.FromResult(0);
