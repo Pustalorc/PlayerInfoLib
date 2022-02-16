@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using OpenMod.API.Ioc;
 using OpenMod.API.Users;
 using Pustalorc.PlayerInfoLib.Unturned.API.Classes;
