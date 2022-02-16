@@ -75,7 +75,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                     pData.Server = server;
                     pData.ServerId = server.Id;
 
-                    await m_PlayerInfoRepository.SaveChangesAsync();
+                    await m_PlayerInfoRepository.UpdatePlayerDataAsync(pData);
                 }
             });
 
@@ -116,7 +116,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                     pData.SteamName = playerId.playerName;
                     pData.TotalPlaytime += leaveTime.Subtract(pData.LastLoginGlobal).TotalSeconds;
 
-                    await m_PlayerInfoRepository.SaveChangesAsync();
+                    await m_PlayerInfoRepository.UpdatePlayerDataAsync(pData);
                 }
             });
 
