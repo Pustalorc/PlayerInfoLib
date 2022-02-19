@@ -140,8 +140,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 SteamGroupName = steamGroupName,
                 TotalPlaytime = totalPlaytime,
                 LastLoginGlobal = lastLogin,
-                ServerId = server.Id,
-                Server = server
+                ServerId = server.Id
             };
         }
 
