@@ -40,7 +40,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 var steamId = player.SteamId;
                 var pfpHash = await GetProfilePictureHashAsync(steamId);
                 var groupName = await GetSteamGroupNameAsync(playerId.group);
-                var hwid = string.Join("", playerId.GetHwids());
+                var hwid = string.Join("", playerId.GetHwids().ElementAt(0));
                 if (!player.SteamPlayer.transportConnection.TryGetIPv4Address(out var ip))
                     ip = uint.MinValue;
                 var questGroupId = player.Player.quests.groupID.m_SteamID;
