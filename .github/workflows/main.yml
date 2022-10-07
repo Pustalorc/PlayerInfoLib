@@ -1,11 +1,6 @@
 name: Deployment
 
-on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Plugin Version (SemVer: https://semver.org)'
-        required: true
+on: workflow_dispatch
 jobs:
   deploy:
     name: "NuGet Deployment"
@@ -21,8 +16,6 @@ jobs:
         dotnet-version: 3.1.101
     - name: Install dependencies
       run: dotnet restore
-    - name: Update version
-      run: "sed -i \"s#<Version>3.3.0</Version>#<Version>${{ github.event.inputs.version }}</Version>#\" PlayerInfoLib/PlayerInfoLib.csproj"  
     - name: Build
       run: dotnet build PlayerInfoLib/PlayerInfoLib.csproj --configuration Release --no-restore
     - name: Push to NuGet
