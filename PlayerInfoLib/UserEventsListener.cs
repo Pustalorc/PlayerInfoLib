@@ -92,7 +92,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 var steamId = player.SteamId;
                 var pfpHash = await GetProfilePictureHashAsync(steamId);
                 var groupName = await GetSteamGroupNameAsync(playerId.group);
-                var hwid = string.Join("", playerId.GetHwids());
+                var hwid = string.Join("", playerId.GetHwids().ElementAt(0));
 
                 var pData = await m_PlayerInfoRepository.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.FindById);
                 var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ??
