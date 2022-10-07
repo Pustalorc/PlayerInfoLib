@@ -16,24 +16,24 @@ Update to latest EFCore versions.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib</PackageProjectUrl>
-    <Copyright>Copyright © 2020-2021 Pustalorc, Nuage</Copyright>
-    <Version>3.3.0</Version>
+    <Copyright>Copyright © 2020-2022 Pustalorc, Nuage</Copyright>
+    <Version>3.6.2</Version>
     <Authors>Pustalorc, Nuage</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.19">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.29">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenMod.EntityFrameworkCore.MySql" Version="3.2.1" />
-    <PackageReference Include="OpenMod.Unturned" Version="3.2.1" />
-	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.21.28" />
+    <PackageReference Include="OpenMod.EntityFrameworkCore.MySql" Version="3.3.8" />
+    <PackageReference Include="OpenMod.Unturned" Version="3.3.8" />
+	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.22.16" />
 	<PackageReference Include="OpenMod.UnityEngine.Redist" Version="2019.4.10" />
     <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net461" Version="1.0.2">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net461" Version="1.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

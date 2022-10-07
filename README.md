@@ -34,7 +34,7 @@ For server data, it only stores the following values:
 - Local Instance Name (Instance)
 - Server Public Name (Name)
 
-##Installation
+## Installation
 
 - `openmod install Pustalorc.PlayerInfoLib`
 - Configure the plugin.

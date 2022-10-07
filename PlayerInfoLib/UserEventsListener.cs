@@ -1,4 +1,4 @@
-﻿// ReSharper disable AnnotateNotNullParameter
+// ReSharper disable AnnotateNotNullParameter
 // ReSharper disable AnnotateNotNullTypeMember
 
 using Microsoft.Extensions.Configuration;
@@ -40,7 +40,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 var steamId = player.SteamId;
                 var pfpHash = await GetProfilePictureHashAsync(steamId);
                 var groupName = await GetSteamGroupNameAsync(playerId.group);
-                var hwid = string.Join("", playerId.hwid);
+                var hwid = string.Join("", playerId.GetHwids().ElementAt(0));
                 if (!player.SteamPlayer.transportConnection.TryGetIPv4Address(out var ip))
                     ip = uint.MinValue;
                 var questGroupId = player.Player.quests.groupID.m_SteamID;
@@ -92,7 +92,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned
                 var steamId = player.SteamId;
                 var pfpHash = await GetProfilePictureHashAsync(steamId);
                 var groupName = await GetSteamGroupNameAsync(playerId.group);
-                var hwid = string.Join("", playerId.hwid);
+                var hwid = string.Join("", playerId.GetHwids().ElementAt(0));
 
                 var pData = await m_PlayerInfoRepository.FindPlayerAsync(player.SteamId.ToString(), UserSearchMode.FindById);
                 var server = await m_PlayerInfoRepository.GetCurrentServerAsync() ??
