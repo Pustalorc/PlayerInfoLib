@@ -11,13 +11,12 @@
     <AssemblyName>Pustalorc.PlayerInfoLib.Unturned</AssemblyName>
     <LangVersion>8</LangVersion>
     <Description>A library to store more information about unturned players.</Description>
-    <PackageReleaseNotes>Switched to Pomelo EFCore.
-Update to latest EFCore versions.</PackageReleaseNotes>
+    <PackageReleaseNotes>Updated to latest OpenMod and Unturned.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib</PackageProjectUrl>
     <Copyright>Copyright © 2020-2022 Pustalorc, Nuage</Copyright>
-    <Version>3.6.2</Version>
+    <Version>3.6.3</Version>
     <Authors>Pustalorc, Nuage</Authors>
   </PropertyGroup>
 
