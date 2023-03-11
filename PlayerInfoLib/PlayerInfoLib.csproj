@@ -11,24 +11,23 @@
     <AssemblyName>Pustalorc.PlayerInfoLib.Unturned</AssemblyName>
     <LangVersion>8</LangVersion>
     <Description>A library to store more information about unturned players.</Description>
-    <PackageReleaseNotes>Switched to Pomelo EFCore.
-Update to latest EFCore versions.</PackageReleaseNotes>
+    <PackageReleaseNotes>Updated to latest OpenMod and Unturned.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib</PackageProjectUrl>
-    <Copyright>Copyright © 2020-2022 Pustalorc, Nuage</Copyright>
-    <Version>3.6.2</Version>
+    <Copyright>Copyright © 2020-2023 Pustalorc, Nuage</Copyright>
+    <Version>3.6.3</Version>
     <Authors>Pustalorc, Nuage</Authors>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.29">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.32">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenMod.EntityFrameworkCore.MySql" Version="3.3.8" />
-    <PackageReference Include="OpenMod.Unturned" Version="3.3.8" />
-	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.22.16" />
+    <PackageReference Include="OpenMod.EntityFrameworkCore.MySql" Version="3.3.9" />
+    <PackageReference Include="OpenMod.Unturned" Version="3.3.9" />
+	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.22.21.4" />
 	<PackageReference Include="OpenMod.UnityEngine.Redist" Version="2019.4.10" />
     <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
       <PrivateAssets>All</PrivateAssets>
