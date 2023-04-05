@@ -16,7 +16,7 @@
     <RepositoryType>Github</RepositoryType>
     <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib</PackageProjectUrl>
     <Copyright>Copyright © 2020-2023 Pustalorc, Nuage</Copyright>
-    <Version>3.6.3</Version>
+    <Version>3.6.4</Version>
     <Authors>Pustalorc, Nuage</Authors>
   </PropertyGroup>
 
