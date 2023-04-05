@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
     <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
 	<PackageTags>openmod openmod-plugin unturned</PackageTags>
 	<RootNamespace>Pustalorc.PlayerInfoLib.Unturned</RootNamespace>
@@ -9,7 +9,7 @@
     <GenerateNugetPackage>true</GenerateNugetPackage>
     <Product>Player Info Library</Product>
     <AssemblyName>Pustalorc.PlayerInfoLib.Unturned</AssemblyName>
-    <LangVersion>8</LangVersion>
+    <LangVersion>11</LangVersion>
     <Description>A library to store more information about unturned players.</Description>
     <PackageReleaseNotes>Updated to latest OpenMod and Unturned.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
@@ -25,10 +25,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenMod.EntityFrameworkCore.MySql" Version="3.3.9" />
-    <PackageReference Include="OpenMod.Unturned" Version="3.3.9" />
-	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.22.21.4" />
-	<PackageReference Include="OpenMod.UnityEngine.Redist" Version="2019.4.10" />
+    <PackageReference Include="OpenMod.EntityFrameworkCore.MySql" Version="3.3.10" />
+    <PackageReference Include="OpenMod.Unturned" Version="3.3.10" />
+	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.4" />
+	<PackageReference Include="OpenMod.UnityEngine.Redist" Version="2020.3.38" />
     <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
