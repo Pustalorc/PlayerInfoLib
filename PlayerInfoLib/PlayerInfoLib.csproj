@@ -3,20 +3,20 @@
   <PropertyGroup>
     <TargetFramework>net481</TargetFramework>
     <PackageLicenseExpression>EUPL-1.2</PackageLicenseExpression>
-    <PackageTags>openmod openmod-plugin unturned</PackageTags>
-    <RootNamespace>Pustalorc.PlayerInfoLib.Unturned</RootNamespace>
+	<PackageTags>openmod openmod-plugin unturned</PackageTags>
+	<RootNamespace>Pustalorc.PlayerInfoLib.Unturned</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateNugetPackage>true</GenerateNugetPackage>
     <Product>Player Info Library</Product>
     <AssemblyName>Pustalorc.PlayerInfoLib.Unturned</AssemblyName>
     <LangVersion>11</LangVersion>
     <Description>A library to store more information about unturned players.</Description>
-    <PackageReleaseNotes>Reverted target framework back to net461.</PackageReleaseNotes>
+    <PackageReleaseNotes>Updated to latest OpenMod and Unturned.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib</PackageProjectUrl>
     <Copyright>Copyright © 2020-2023 Pustalorc, Nuage</Copyright>
-    <Version>3.6.5</Version>
+    <Version>3.6.6</Version>
     <Authors>Pustalorc, Nuage</Authors>
   </PropertyGroup>
 
@@ -25,9 +25,9 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="OpenMod.EntityFrameworkCore.MySql" Version="3.3.10" />
-    <PackageReference Include="OpenMod.Unturned" Version="3.3.10" />
-	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.4" />
+    <PackageReference Include="OpenMod.EntityFrameworkCore.MySql" Version="3.3.13" />
+    <PackageReference Include="OpenMod.Unturned" Version="3.3.13" />
+	<PackageReference Include="OpenMod.Unturned.Redist" Version="3.23.5" />
 	<PackageReference Include="OpenMod.UnityEngine.Redist" Version="2020.3.38" />
     <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
       <PrivateAssets>All</PrivateAssets>
