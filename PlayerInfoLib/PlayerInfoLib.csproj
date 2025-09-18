@@ -11,7 +11,7 @@
     <AssemblyName>Pustalorc.PlayerInfoLib.Unturned</AssemblyName>
     <LangVersion>11</LangVersion>
     <Description>A library to store more information about unturned players.</Description>
-    <PackageReleaseNotes>Updated to latest OpenMod and Unturned.</PackageReleaseNotes>
+    <PackageReleaseNotes>Converted to .netstandart 2.1, updated to latest OpenMod and Unturned.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
     <RepositoryType>Github</RepositoryType>
     <PackageProjectUrl>https://github.com/Pustalorc/PlayerInfoLib</PackageProjectUrl>
