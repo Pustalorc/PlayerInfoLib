@@ -9,7 +9,7 @@
     <GenerateNugetPackage>true</GenerateNugetPackage>
     <Product>Player Info Library</Product>
     <AssemblyName>Pustalorc.PlayerInfoLib.Unturned</AssemblyName>
-    <LangVersion>11</LangVersion>
+    <LangVersion>13</LangVersion>
     <Description>A library to store more information about unturned players.</Description>
     <PackageReleaseNotes>Converted to .netstandart 2.1, updated to latest OpenMod and Unturned.</PackageReleaseNotes>
     <RepositoryUrl>https://github.com/Pustalorc/PlayerInfoLib</RepositoryUrl>
