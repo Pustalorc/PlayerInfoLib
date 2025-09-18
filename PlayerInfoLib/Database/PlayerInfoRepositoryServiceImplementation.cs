@@ -216,8 +216,7 @@ namespace Pustalorc.PlayerInfoLib.Unturned.Database
 
         private async Task<Server> GetCurrentServerInternalAsync(PlayerInfoLibDbContext dbContext)
         {
-            return await dbContext.Servers.FirstOrDefaultAsync(k =>
-                k.Instance.Equals(Provider.serverID, StringComparison.Ordinal));
+            return await dbContext.Servers.FirstOrDefaultAsync(k => k.Instance == Provider.serverID);
         }
 
         private Server GetCurrentServerInternal(PlayerInfoLibDbContext dbContext)
